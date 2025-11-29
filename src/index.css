@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+body {
+  @apply bg-white text-black;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #6A1B9A 0%, #8E24AA 100%);
+}
+
+.glow-purple {
+  box-shadow: 0 4px 30px rgba(138, 36, 170, 0.2);
+}
+
+.text-gradient-purple {
+  background: linear-gradient(135deg, #6A1B9A 0%, #8E24AA 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
