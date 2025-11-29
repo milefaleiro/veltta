@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
 
 const AuthContext = createContext(null);
 
@@ -15,42 +16,44 @@ export const AuthProvider = ({ children }) => {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
-        // Check for existing session
-        const savedUser = localStorage.getItem('veltta_user');
-        if (savedUser) {
-            try {
-                setUser(JSON.parse(savedUser));
-            } catch (e) {
-                localStorage.removeItem('veltta_user');
-            }
-        }
-        setIsLoading(false);
+        // Check active session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUser(session?.user ?? null);
+            setIsLoading(false);
+        });
+
+        // Listen for auth changes
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUser(session?.user ?? null);
+            setIsLoading(false);
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
     const login = async (email, password) => {
-        // Simulação - em produção, conectar com backend real
-        // Admin credentials para demo: admin@veltta.com.br / admin123
-        if (email === 'admin@veltta.com.br' && password === 'admin123') {
-            const userData = {
-                id: '1',
+        try {
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email,
-                name: 'Administrador',
-                role: 'admin',
-                avatar: null
-            };
-            setUser(userData);
-            localStorage.setItem('veltta_user', JSON.stringify(userData));
+                password,
+            });
+
+            if (error) throw error;
+
             return { success: true };
+        } catch (error) {
+            console.error('Login error:', error);
+            return { success: false, error: error.message || 'Erro ao fazer login' };
         }
-        return { success: false, error: 'Credenciais inválidas' };
     };
 
-    const logout = () => {
+    const logout = async () => {
+        await supabase.auth.signOut();
         setUser(null);
-        localStorage.removeItem('veltta_user');
     };
 
-    const isAdmin = user?.role === 'admin';
+    // Check if user has admin role in metadata or is the specific admin email
+    const isAdmin = user?.user_metadata?.role === 'admin' || user?.email === 'milenafaleiro@outlook.com';
 
     return (
         <AuthContext.Provider value={{ user, isAdmin, isLoading, login, logout }}>
