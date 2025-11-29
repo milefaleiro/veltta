@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Newspaper, Mic, Video, FileSpreadsheet, Download, BookOpen } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 const ContentContext = createContext(null);
 
@@ -49,147 +50,84 @@ export const CONTENT_CATEGORIES = [
     { id: 'tecnologia', label: 'Tecnologia' }
 ];
 
-// Conteúdos iniciais
-const initialContent = [
-    {
-        id: '1',
-        type: 'artigo',
-        title: "5 métricas de Compras que todo C-Level deveria acompanhar",
-        description: "Descubra quais indicadores são essenciais para demonstrar o valor estratégico da área de compras para a alta gestão.",
-        content: `<h2>Introdução</h2>
-<p>A área de compras evoluiu de uma função operacional para um pilar estratégico das organizações. Para demonstrar esse valor, é fundamental acompanhar as métricas certas.</p>
-
-<h2>1. Savings (Economia Gerada)</h2>
-<p>O indicador mais tradicional, mas ainda relevante. Mede a diferença entre o preço de referência e o preço negociado.</p>
-<blockquote>Dica: Vá além do saving nominal e calcule o saving realizado vs. orçamento.</blockquote>
-
-<h2>2. Cost Avoidance</h2>
-<p>Muitas vezes esquecido, o cost avoidance captura economias que não aparecem diretamente como redução de preço.</p>
-
-<h2>3. Spend Under Management</h2>
-<p>Percentual do gasto total que passa pela área de compras. Quanto maior, mais controle e oportunidade de negociação.</p>
-
-<h2>4. Supplier Performance Score</h2>
-<p>Avaliação consolidada dos fornecedores em critérios como qualidade, prazo e serviço.</p>
-
-<h2>5. Time-to-Contract</h2>
-<p>Tempo médio desde a requisição até a assinatura do contrato. Impacta diretamente a agilidade do negócio.</p>
-
-<h2>Conclusão</h2>
-<p>Essas métricas, quando bem comunicadas, transformam a percepção da área de compras perante a alta gestão.</p>`,
-        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800",
-        date: "2024-11-20",
-        readTime: "8 min de leitura",
-        category: "analytics",
-        tags: ["métricas", "KPIs", "gestão"],
-        featured: true,
-        author: "Equipe Veltta",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: '2',
-        type: 'video',
-        title: "O Futuro do Procurement: Tendências para 2025",
-        description: "Conversamos sobre as principais tendências que vão transformar a área de compras nos próximos anos.",
-        content: "",
-        image: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800",
-        videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-        date: "2024-11-18",
-        readTime: "45 min",
-        category: "tecnologia",
-        tags: ["tendências", "futuro", "tecnologia"],
-        featured: true,
-        author: "Equipe Veltta",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    },
-    {
-        id: '3',
-        type: 'ferramenta',
-        title: "Planilha de Análise de Fornecedores",
-        description: "Template completo para avaliar e comparar fornecedores com critérios ponderados. Pronto para uso.",
-        content: `<h2>O que está incluso</h2>
-<ul>
-<li>Matriz de avaliação com 15 critérios</li>
-<li>Peso customizável por critério</li>
-<li>Gráfico radar automático</li>
-<li>Comparativo lado a lado</li>
-<li>Histórico de avaliações</li>
-</ul>
-
-<h2>Como usar</h2>
-<p>1. Baixe o arquivo e abra no Excel ou Google Sheets</p>
-<p>2. Configure os pesos dos critérios na aba "Configuração"</p>
-<p>3. Preencha as avaliações na aba "Avaliação"</p>
-<p>4. Veja o resultado consolidado na aba "Dashboard"</p>`,
-        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800",
-        downloadUrl: "/downloads/analise-fornecedores.xlsx",
-        downloadName: "Planilha_Analise_Fornecedores_Veltta.xlsx",
-        fileSize: "245 KB",
-        fileType: "xlsx",
-        date: "2024-11-22",
-        category: "gestao",
-        tags: ["planilha", "fornecedores", "avaliação"],
-        featured: true,
-        author: "Equipe Veltta",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-    }
-];
-
 export const ContentProvider = ({ children }) => {
     const [contents, setContents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        // Load from localStorage or use initial content
-        const saved = localStorage.getItem('veltta_contents_v2');
-        if (saved) {
-            try {
-                setContents(JSON.parse(saved));
-            } catch (e) {
-                setContents(initialContent);
-                localStorage.setItem('veltta_contents_v2', JSON.stringify(initialContent));
-            }
-        } else {
-            setContents(initialContent);
-            localStorage.setItem('veltta_contents_v2', JSON.stringify(initialContent));
+    const fetchContents = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('contents')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setContents(data || []);
+        } catch (error) {
+            console.error('Erro ao buscar conteúdos:', error);
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
+    };
+
+    useEffect(() => {
+        fetchContents();
     }, []);
 
-    const saveToStorage = (newContents) => {
-        localStorage.setItem('veltta_contents_v2', JSON.stringify(newContents));
+    const addContent = async (content) => {
+        try {
+            // Remove id if present to let DB generate it, or ensure it matches DB type
+            const { id, ...contentData } = content;
+            
+            const { data, error } = await supabase
+                .from('contents')
+                .insert([contentData])
+                .select()
+                .single();
+
+            if (error) throw error;
+            
+            setContents(prev => [data, ...prev]);
+            return data;
+        } catch (error) {
+            console.error('Erro ao adicionar conteúdo:', error);
+            throw error;
+        }
     };
 
-    const addContent = (content) => {
-        const newContent = {
-            ...content,
-            id: crypto.randomUUID(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        };
-        const updated = [newContent, ...contents];
-        setContents(updated);
-        saveToStorage(updated);
-        return newContent;
+    const updateContent = async (id, updates) => {
+        try {
+            const { data, error } = await supabase
+                .from('contents')
+                .update(updates)
+                .eq('id', id)
+                .select()
+                .single();
+
+            if (error) throw error;
+
+            setContents(prev => prev.map(item => item.id === id ? data : item));
+            return data;
+        } catch (error) {
+            console.error('Erro ao atualizar conteúdo:', error);
+            throw error;
+        }
     };
 
-    const updateContent = (id, updates) => {
-        const updated = contents.map(item =>
-            item.id === id
-                ? { ...item, ...updates, updatedAt: new Date().toISOString() }
-                : item
-        );
-        setContents(updated);
-        saveToStorage(updated);
-    };
+    const deleteContent = async (id) => {
+        try {
+            const { error } = await supabase
+                .from('contents')
+                .delete()
+                .eq('id', id);
 
-    const deleteContent = (id) => {
-        const updated = contents.filter(item => item.id !== id);
-        setContents(updated);
-        saveToStorage(updated);
+            if (error) throw error;
+
+            setContents(prev => prev.filter(item => item.id !== id));
+        } catch (error) {
+            console.error('Erro ao deletar conteúdo:', error);
+            throw error;
+        }
     };
 
     const getContentById = (id) => {
