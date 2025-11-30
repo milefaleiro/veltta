@@ -1,3 +1,7 @@
+# abc
+info.md
+
+
 # Logs
 logs
 *.log
@@ -127,3 +131,4 @@ Thumbs.db
 
 # Supabase
 supabase/.temp/
+.vercel

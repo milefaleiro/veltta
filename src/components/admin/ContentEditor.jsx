@@ -263,11 +263,11 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                                 type="button"
                                                 onClick={() => handleChange('type', key)}
                                                 className={`flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all ${formData.type === key
-                                                        ? key === 'artigo' ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                                            : key === 'video' ? 'border-red-500 bg-red-50 text-red-700'
-                                                                : key === 'ferramenta' ? 'border-green-500 bg-green-50 text-green-700'
-                                                                    : 'border-purple-500 bg-purple-50 text-purple-700'
-                                                        : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                                                    ? key === 'artigo' ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                                        : key === 'video' ? 'border-red-500 bg-red-50 text-red-700'
+                                                            : key === 'ferramenta' ? 'border-green-500 bg-green-50 text-green-700'
+                                                                : 'border-purple-500 bg-purple-50 text-purple-700'
+                                                    : 'border-gray-200 hover:border-gray-300 text-gray-600'
                                                     }`}
                                             >
                                                 <Icon className="w-5 h-5" />
@@ -381,6 +381,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                         <div className="flex items-center gap-1 pr-2 border-r border-gray-200">
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('bold')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Negrito"
@@ -389,6 +390,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                             </button>
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('italic')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Itálico"
@@ -397,6 +399,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                             </button>
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('underline')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Sublinhado"
@@ -408,6 +411,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                         <div className="flex items-center gap-1 px-2 border-r border-gray-200">
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('formatBlock', '<h1>')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Título 1"
@@ -416,6 +420,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                             </button>
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('formatBlock', '<h2>')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Título 2"
@@ -427,6 +432,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                         <div className="flex items-center gap-1 px-2 border-r border-gray-200">
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('insertUnorderedList')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Lista"
@@ -435,6 +441,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                             </button>
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('insertOrderedList')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Lista numerada"
@@ -443,6 +450,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                             </button>
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('formatBlock', '<blockquote>')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Citação"
@@ -454,6 +462,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                         <div className="flex items-center gap-1 px-2">
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('justifyLeft')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Alinhar à esquerda"
@@ -462,6 +471,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                             </button>
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('justifyCenter')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Centralizar"
@@ -470,6 +480,7 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                             </button>
                                             <button
                                                 type="button"
+                                                onMouseDown={(e) => e.preventDefault()}
                                                 onClick={() => formatText('justifyRight')}
                                                 className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
                                                 title="Alinhar à direita"
