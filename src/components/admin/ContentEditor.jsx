@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     X, Save, Trash2, Image, Link, Calendar, Clock, Star,
@@ -9,6 +9,33 @@ import {
 } from 'lucide-react';
 import { useContent, CONTENT_TYPES, CONTENT_CATEGORIES } from '@/contexts/ContentContext';
 import { useToast } from '@/components/ui/use-toast';
+
+const ContentEditable = ({ html, onChange, className, contentRef }) => {
+    const lastHtml = useRef(html);
+
+    useLayoutEffect(() => {
+        if (contentRef.current && html !== contentRef.current.innerHTML) {
+            contentRef.current.innerHTML = html;
+        }
+        lastHtml.current = html;
+    }, [html, contentRef]);
+
+    const handleInput = (e) => {
+        const newHtml = e.target.innerHTML;
+        lastHtml.current = newHtml;
+        onChange({ target: { value: newHtml } });
+    };
+
+    return (
+        <div
+            ref={contentRef}
+            className={className}
+            onInput={handleInput}
+            contentEditable
+            style={{ minHeight: '200px', lineHeight: '1.6' }}
+        />
+    );
+};
 
 const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
     const { addContent, updateContent, deleteContent } = useContent();
@@ -505,16 +532,11 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
                                     </div>
 
                                     {/* Editable Content Area */}
-                                    <div
-                                        ref={contentRef}
-                                        contentEditable
-                                        onInput={handleContentChange}
-                                        dangerouslySetInnerHTML={{ __html: formData.content }}
+                                    <ContentEditable
+                                        html={formData.content}
+                                        onChange={(e) => handleChange('content', e.target.value)}
                                         className="w-full min-h-[200px] px-4 py-3 border border-gray-200 rounded-b-xl focus:outline-none focus:ring-2 focus:ring-[#6A1B9A]/20 focus:border-[#6A1B9A] transition-all prose prose-sm max-w-none"
-                                        style={{
-                                            minHeight: '200px',
-                                            lineHeight: '1.6'
-                                        }}
+                                        contentRef={contentRef}
                                     />
                                 </div>
                             </div>
