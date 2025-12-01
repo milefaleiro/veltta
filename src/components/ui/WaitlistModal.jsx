@@ -95,7 +95,7 @@ const WaitlistModal = ({ isOpen, onClose }) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
                 onClick={handleBackdropClick}
             >
                 <motion.div
@@ -103,55 +103,49 @@ const WaitlistModal = ({ isOpen, onClose }) => {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
                     transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                    className="relative w-full max-w-md bg-[#1C1C1C] rounded-2xl border border-white/10 shadow-2xl overflow-hidden"
+                    className="relative w-full max-w-sm bg-[#1C1C1C] rounded-2xl border border-white/10 shadow-2xl overflow-hidden my-auto"
                 >
                     {/* Header com gradiente */}
-                    <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-6 text-white">
+                    <div className="bg-gradient-to-r from-purple-600 to-pink-500 p-4 text-white">
                         <button
                             onClick={onClose}
-                            className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                            className="absolute top-3 right-3 p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
                         >
-                            <X className="w-5 h-5" />
+                            <X className="w-4 h-4" />
                         </button>
-                        <div className="flex items-center gap-3 mb-2">
-                            <GraduationCap className="w-8 h-8" />
-                            <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">
-                                Lista de Espera
-                            </span>
-                        </div>
-                        <h3 className="text-2xl font-bold">
+                        <h3 className="text-lg font-bold pr-8">
                             Fundamentos de Compras Estratégicas
                         </h3>
-                        <p className="text-white/80 mt-1">
+                        <p className="text-white/80 text-sm mt-1">
                             Início em 26/01/2026 • Condições especiais para inscritos
                         </p>
                     </div>
 
                     {/* Conteúdo */}
-                    <div className="p-6">
+                    <div className="p-4">
                         {isSuccess ? (
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-center py-8"
+                                className="text-center py-6"
                             >
-                                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-                                <h4 className="text-xl font-bold text-white mb-2">
+                                <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                                <h4 className="text-lg font-bold text-white mb-2">
                                     Inscrição Confirmada!
                                 </h4>
-                                <p className="text-gray-400">
-                                    Você receberá um email com condições especiais e um cupom de 10% de desconto quando o curso for lançado.
+                                <p className="text-gray-400 text-sm">
+                                    Você receberá um email com condições especiais e 10% de desconto.
                                 </p>
                             </motion.div>
                         ) : (
                             <>
-                                <p className="text-gray-400 mb-6">
+                                <p className="text-gray-400 text-sm mb-4">
                                     Cadastre-se para receber em primeira mão as informações do curso e garantir um <span className="text-purple-400 font-semibold">cupom de 10% de desconto</span>.
                                 </p>
 
-                                <form onSubmit={handleSubmit} className="space-y-4">
+                                <form onSubmit={handleSubmit} className="space-y-3">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        <label className="block text-xs font-medium text-gray-300 mb-1">
                                             Nome <span className="text-red-400">*</span>
                                         </label>
                                         <input
@@ -160,13 +154,13 @@ const WaitlistModal = ({ isOpen, onClose }) => {
                                             value={formData.name}
                                             onChange={handleChange}
                                             placeholder="Seu nome completo"
-                                            className="w-full px-4 py-3 bg-[#2a2a2a] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+                                            className="w-full px-3 py-2 bg-[#2a2a2a] border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
                                             required
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        <label className="block text-xs font-medium text-gray-300 mb-1">
                                             Email <span className="text-red-400">*</span>
                                         </label>
                                         <input
@@ -175,13 +169,13 @@ const WaitlistModal = ({ isOpen, onClose }) => {
                                             value={formData.email}
                                             onChange={handleChange}
                                             placeholder="seu@email.com"
-                                            className="w-full px-4 py-3 bg-[#2a2a2a] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+                                            className="w-full px-3 py-2 bg-[#2a2a2a] border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
                                             required
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-300 mb-1">
+                                        <label className="block text-xs font-medium text-gray-300 mb-1">
                                             Telefone <span className="text-gray-500">(opcional)</span>
                                         </label>
                                         <input
@@ -190,13 +184,13 @@ const WaitlistModal = ({ isOpen, onClose }) => {
                                             value={formData.phone}
                                             onChange={handleChange}
                                             placeholder="(11) 99999-9999"
-                                            className="w-full px-4 py-3 bg-[#2a2a2a] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+                                            className="w-full px-3 py-2 bg-[#2a2a2a] border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
                                         />
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-2 gap-3">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                                            <label className="block text-xs font-medium text-gray-300 mb-1">
                                                 Empresa <span className="text-gray-500">(opcional)</span>
                                             </label>
                                             <input
@@ -205,11 +199,11 @@ const WaitlistModal = ({ isOpen, onClose }) => {
                                                 value={formData.company}
                                                 onChange={handleChange}
                                                 placeholder="Sua empresa"
-                                                className="w-full px-4 py-3 bg-[#2a2a2a] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+                                                className="w-full px-3 py-2 bg-[#2a2a2a] border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-300 mb-1">
+                                            <label className="block text-xs font-medium text-gray-300 mb-1">
                                                 Cargo <span className="text-gray-500">(opcional)</span>
                                             </label>
                                             <input
@@ -218,23 +212,23 @@ const WaitlistModal = ({ isOpen, onClose }) => {
                                                 value={formData.position}
                                                 onChange={handleChange}
                                                 placeholder="Seu cargo"
-                                                className="w-full px-4 py-3 bg-[#2a2a2a] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
+                                                className="w-full px-3 py-2 bg-[#2a2a2a] border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-purple-500 transition-colors"
                                             />
                                         </div>
                                     </div>
 
                                     {error && (
-                                        <p className="text-red-400 text-sm">{error}</p>
+                                        <p className="text-red-400 text-xs">{error}</p>
                                     )}
 
                                     <button
                                         type="submit"
                                         disabled={isSubmitting}
-                                        className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
                                     >
                                         {isSubmitting ? (
                                             <>
-                                                <Loader2 className="w-5 h-5 animate-spin" />
+                                                <Loader2 className="w-4 h-4 animate-spin" />
                                                 Enviando...
                                             </>
                                         ) : (
@@ -243,8 +237,8 @@ const WaitlistModal = ({ isOpen, onClose }) => {
                                     </button>
                                 </form>
 
-                                <p className="text-xs text-gray-500 text-center mt-4">
-                                    Seus dados estão seguros. Não compartilhamos com terceiros.
+                                <p className="text-xs text-gray-500 text-center mt-3">
+                                    Seus dados estão seguros.
                                 </p>
                             </>
                         )}
