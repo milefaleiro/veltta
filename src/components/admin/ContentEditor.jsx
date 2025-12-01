@@ -153,13 +153,13 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
 
         try {
             if (editingContent) {
-                updateContent(editingContent.id, formData);
+                await updateContent(editingContent.id, formData);
                 toast({
                     title: "Conteúdo atualizado!",
                     description: "As alterações foram salvas com sucesso."
                 });
             } else {
-                addContent(formData);
+                await addContent(formData);
                 toast({
                     title: "Conteúdo criado!",
                     description: "O novo conteúdo foi adicionado com sucesso."
@@ -167,14 +167,15 @@ const ContentEditor = ({ isOpen, onClose, editingContent = null }) => {
             }
             onClose();
         } catch (error) {
+            console.error('Erro ao salvar:', error);
             toast({
-                title: "Erro",
-                description: "Ocorreu um erro ao salvar o conteúdo.",
+                title: "Erro ao salvar",
+                description: error.message || "Ocorreu um erro ao salvar o conteúdo. Verifique o console para mais detalhes.",
                 variant: "destructive"
             });
+        } finally {
+            setIsLoading(false);
         }
-
-        setIsLoading(false);
     };
 
     const handleDelete = () => {

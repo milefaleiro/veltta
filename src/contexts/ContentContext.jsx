@@ -54,6 +54,35 @@ export const ContentProvider = ({ children }) => {
     const [contents, setContents] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Converte camelCase (JavaScript) para snake_case (banco de dados)
+    const toSnakeCase = (data) => {
+        const { videoUrl, downloadUrl, downloadName, fileSize, fileType, readTime, ...rest } = data;
+        return {
+            ...rest,
+            video_url: videoUrl,
+            download_url: downloadUrl,
+            download_name: downloadName,
+            file_size: fileSize,
+            file_type: fileType,
+            read_time: readTime
+        };
+    };
+
+    // Converte snake_case (banco de dados) para camelCase (JavaScript)
+    const toCamelCase = (data) => {
+        if (!data) return data;
+        const { video_url, download_url, download_name, file_size, file_type, read_time, ...rest } = data;
+        return {
+            ...rest,
+            videoUrl: video_url,
+            downloadUrl: download_url,
+            downloadName: download_name,
+            fileSize: file_size,
+            fileType: file_type,
+            readTime: read_time
+        };
+    };
+
     const fetchContents = async () => {
         try {
             const { data, error } = await supabase
@@ -62,7 +91,10 @@ export const ContentProvider = ({ children }) => {
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
-            setContents(data || []);
+            
+            // Converte todos os itens para camelCase
+            const camelData = (data || []).map(toCamelCase);
+            setContents(camelData);
         } catch (error) {
             console.error('Erro ao buscar conteúdos:', error);
         } finally {
@@ -76,19 +108,24 @@ export const ContentProvider = ({ children }) => {
 
     const addContent = async (content) => {
         try {
-            // Remove id if present to let DB generate it, or ensure it matches DB type
+            // Remove id if present to let DB generate it
             const { id, ...contentData } = content;
+            
+            // Converte para snake_case antes de enviar ao banco
+            const dbData = toSnakeCase(contentData);
             
             const { data, error } = await supabase
                 .from('contents')
-                .insert([contentData])
+                .insert([dbData])
                 .select()
                 .single();
 
             if (error) throw error;
             
-            setContents(prev => [data, ...prev]);
-            return data;
+            // Converte de volta para camelCase
+            const camelData = toCamelCase(data);
+            setContents(prev => [camelData, ...prev]);
+            return camelData;
         } catch (error) {
             console.error('Erro ao adicionar conteúdo:', error);
             throw error;
@@ -97,17 +134,22 @@ export const ContentProvider = ({ children }) => {
 
     const updateContent = async (id, updates) => {
         try {
+            // Converte para snake_case antes de enviar ao banco
+            const dbUpdates = toSnakeCase(updates);
+            
             const { data, error } = await supabase
                 .from('contents')
-                .update(updates)
+                .update(dbUpdates)
                 .eq('id', id)
                 .select()
                 .single();
 
             if (error) throw error;
 
-            setContents(prev => prev.map(item => item.id === id ? data : item));
-            return data;
+            // Converte de volta para camelCase
+            const camelData = toCamelCase(data);
+            setContents(prev => prev.map(item => item.id === id ? camelData : item));
+            return camelData;
         } catch (error) {
             console.error('Erro ao atualizar conteúdo:', error);
             throw error;
