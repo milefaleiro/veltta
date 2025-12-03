@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Newspaper, Mic, Video, FileSpreadsheet, Download, BookOpen } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 
 const ContentContext = createContext(null);
 
@@ -51,7 +52,9 @@ export const CONTENT_CATEGORIES = [
 ];
 
 export const ContentProvider = ({ children }) => {
+    const { user } = useAuth();
     const [contents, setContents] = useState([]);
+    const [savedContentIds, setSavedContentIds] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
     // Converte camelCase (JavaScript) para snake_case (banco de dados)
@@ -105,6 +108,60 @@ export const ContentProvider = ({ children }) => {
     useEffect(() => {
         fetchContents();
     }, []);
+
+    useEffect(() => {
+        if (user) {
+            fetchSavedContents();
+        } else {
+            setSavedContentIds([]);
+        }
+    }, [user]);
+
+    const fetchSavedContents = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('saved_contents')
+                .select('content_id');
+            
+            if (error) throw error;
+            if (data) setSavedContentIds(data.map(item => item.content_id));
+        } catch (error) {
+            console.error('Erro ao buscar conteúdos salvos:', error);
+        }
+    };
+
+    const toggleSaveContent = async (contentId) => {
+        if (!user) return { error: 'not_logged_in' };
+        
+        try {
+            const isSaved = savedContentIds.includes(contentId);
+            if (isSaved) {
+                const { error } = await supabase
+                    .from('saved_contents')
+                    .delete()
+                    .match({ user_id: user.id, content_id: contentId });
+                
+                if (error) throw error;
+                setSavedContentIds(prev => prev.filter(id => id !== contentId));
+                return { saved: false };
+            } else {
+                const { error } = await supabase
+                    .from('saved_contents')
+                    .insert({ user_id: user.id, content_id: contentId });
+                
+                if (error) throw error;
+                setSavedContentIds(prev => [...prev, contentId]);
+                return { saved: true };
+            }
+        } catch (error) {
+            console.error('Erro ao salvar conteúdo:', error);
+            return { error: error.message };
+        }
+    };
+
+    const getSavedContents = () => {
+        return contents.filter(item => savedContentIds.includes(item.id));
+    };
 
     const addContent = async (content) => {
         try {
@@ -211,6 +268,9 @@ export const ContentProvider = ({ children }) => {
             getContentsByCategory,
             getFeaturedContents,
             searchContents,
+            savedContentIds,
+            toggleSaveContent,
+            getSavedContents,
             CONTENT_TYPES,
             CONTENT_CATEGORIES
         }}>

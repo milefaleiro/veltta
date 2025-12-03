@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Newspaper, Mic, Video, FileSpreadsheet, Filter, Search, Calendar, Clock, 
     ArrowLeft, ExternalLink, Plus, Pencil, LogIn, LogOut, User, Download,
-    BookOpen, GraduationCap, Building2, ArrowRight, Play, ChevronRight, Tag, MessageCircle, Users
+    BookOpen, GraduationCap, Building2, ArrowRight, Play, ChevronRight, Tag, MessageCircle, Users, Bookmark
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useContent, CONTENT_TYPES, CONTENT_CATEGORIES } from '@/contexts/ContentContext';
@@ -15,7 +15,7 @@ import WaitlistModal from '@/components/ui/WaitlistModal';
 
 const KnowledgeHub = ({ onBack }) => {
     const { user, isAdmin, logout } = useAuth();
-    const { contents, isLoading } = useContent();
+    const { contents, isLoading, savedContentIds, toggleSaveContent } = useContent();
     
     const [activeFilter, setActiveFilter] = useState('todos');
     const [activeCategory, setActiveCategory] = useState('todos');
@@ -26,6 +26,7 @@ const KnowledgeHub = ({ onBack }) => {
     const [editingContent, setEditingContent] = useState(null);
     const [viewingContent, setViewingContent] = useState(null);
     const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+    const [showSavedOnly, setShowSavedOnly] = useState(false);
 
     const whatsappLink = "https://wa.me/5521972257438?text=Olá! Gostaria de saber mais sobre os treinamentos In Company da Veltta.";
 
@@ -44,9 +45,10 @@ const KnowledgeHub = ({ onBack }) => {
             const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                   item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                   item.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
-            return matchesType && matchesCategory && matchesSearch;
+            const matchesSaved = !showSavedOnly || savedContentIds.includes(item.id);
+            return matchesType && matchesCategory && matchesSearch && matchesSaved;
         });
-    }, [contents, activeFilter, activeCategory, searchTerm]);
+    }, [contents, activeFilter, activeCategory, searchTerm, showSavedOnly, savedContentIds]);
 
     const featuredContent = contents.filter(item => item.featured).slice(0, 3);
     const ferramentas = contents.filter(item => item.type === 'ferramenta').slice(0, 4);
@@ -82,6 +84,15 @@ const KnowledgeHub = ({ onBack }) => {
         setViewingContent(content);
     };
 
+    const handleToggleSave = async (e, contentId) => {
+        e.stopPropagation();
+        if (!user) {
+            setShowLoginModal(true);
+            return;
+        }
+        await toggleSaveContent(contentId);
+    };
+
     if (viewingContent) {
         return <ContentViewer content={viewingContent} onBack={() => setViewingContent(null)} isAdmin={isAdmin} onEdit={() => handleEditContent(viewingContent)} />;
     }
@@ -97,18 +108,26 @@ const KnowledgeHub = ({ onBack }) => {
                             <span className="hidden sm:inline">Voltar</span>
                         </button>
                         <div className="flex items-center gap-3">
-                            {isAdmin ? (
+                            {user ? (
                                 <>
+                                    <button 
+                                        onClick={() => setShowSavedOnly(!showSavedOnly)}
+                                        className={`hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full text-sm transition-colors ${showSavedOnly ? 'bg-white text-[#6A1B9A]' : 'bg-white/10 text-white hover:bg-white/20'}`}
+                                    >
+                                        <Bookmark className={`w-4 h-4 ${showSavedOnly ? 'fill-current' : ''}`} />
+                                        Meus Salvos
+                                    </button>
                                     <span className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-full text-sm">
-                                        <User className="w-4 h-4" />{user?.name}
+                                        <User className="w-4 h-4" />{user?.user_metadata?.name || user?.email?.split('@')[0]}
                                     </span>
-                                    <button onClick={logout} className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm">
+                                    <button onClick={() => { logout(); setShowSavedOnly(false); }} className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm" title="Sair">
                                         <LogOut className="w-4 h-4" />
                                     </button>
                                 </>
                             ) : (
-                                <button onClick={() => setShowLoginModal(true)} className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm">
+                                <button onClick={() => setShowLoginModal(true)} className="flex items-center gap-2 px-4 py-2 bg-white text-[#6A1B9A] hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors">
                                     <LogIn className="w-4 h-4" />
+                                    Entrar / Criar Conta
                                 </button>
                             )}
                         </div>
@@ -215,7 +234,7 @@ const KnowledgeHub = ({ onBack }) => {
                 {/* Conteúdos */}
                 <section>
                     <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                        {activeFilter === 'todos' ? 'Últimos Conteúdos' : CONTENT_TYPES[activeFilter]?.label + 's'}
+                                {showSavedOnly ? 'Meus Conteúdos Salvos' : (activeFilter === 'todos' ? 'Últimos Conteúdos' : CONTENT_TYPES[activeFilter]?.label + 's')}
                         <span className="text-gray-400 font-normal text-base">({filteredContent.length})</span>
                     </h2>
 
@@ -239,10 +258,17 @@ const KnowledgeHub = ({ onBack }) => {
                                         className="group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer border border-gray-100"
                                     >
                                         {isAdmin && (
-                                            <button onClick={(e) => { e.stopPropagation(); handleEditContent(item); }} className="absolute top-3 right-3 z-10 p-2 bg-white/90 rounded-lg shadow opacity-0 group-hover:opacity-100">
-                                                <Pencil className="w-4 h-4" />
+                                            <button onClick={(e) => { e.stopPropagation(); handleEditContent(item); }} className="absolute top-3 right-3 z-10 p-2 bg-white/90 rounded-lg shadow opacity-0 group-hover:opacity-100 hover:bg-white transition-all">
+                                                <Pencil className="w-4 h-4 text-gray-700" />
                                             </button>
                                         )}
+                                        <button 
+                                            onClick={(e) => handleToggleSave(e, item.id)}
+                                            className={`absolute top-3 ${isAdmin ? 'right-12' : 'right-3'} z-10 p-2 rounded-lg shadow transition-all ${savedContentIds.includes(item.id) ? 'bg-[#6A1B9A] text-white opacity-100' : 'bg-white/90 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-[#6A1B9A]'}`}
+                                            title={savedContentIds.includes(item.id) ? "Remover dos salvos" : "Salvar conteúdo"}
+                                        >
+                                            <Bookmark className={`w-4 h-4 ${savedContentIds.includes(item.id) ? 'fill-current' : ''}`} />
+                                        </button>
                                         <div className="relative h-40">
                                             <img src={item.image} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                                             {item.type === 'video' && (

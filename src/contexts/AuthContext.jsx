@@ -47,6 +47,28 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const signUp = async (email, password, name) => {
+        try {
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    data: {
+                        name: name,
+                        role: 'user'
+                    }
+                }
+            });
+
+            if (error) throw error;
+
+            return { success: true };
+        } catch (error) {
+            console.error('SignUp error:', error);
+            return { success: false, error: error.message || 'Erro ao criar conta' };
+        }
+    };
+
     const logout = async () => {
         await supabase.auth.signOut();
         setUser(null);
@@ -56,7 +78,7 @@ export const AuthProvider = ({ children }) => {
     const isAdmin = user?.user_metadata?.role === 'admin' || user?.email === 'milenafaleiro@outlook.com';
 
     return (
-        <AuthContext.Provider value={{ user, isAdmin, isLoading, login, logout }}>
+        <AuthContext.Provider value={{ user, isAdmin, isLoading, login, signUp, logout }}>
             {children}
         </AuthContext.Provider>
     );

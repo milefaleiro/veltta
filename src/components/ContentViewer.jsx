@@ -1,14 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
     ArrowLeft, Calendar, Clock, User, Tag, Download, Play,
     Share2, Bookmark, Pencil, ExternalLink, FileSpreadsheet
 } from 'lucide-react';
-import { CONTENT_TYPES, CONTENT_CATEGORIES } from '@/contexts/ContentContext';
+import { CONTENT_TYPES, CONTENT_CATEGORIES, useContent } from '@/contexts/ContentContext';
+import { useAuth } from '@/contexts/AuthContext';
+import LoginModal from '@/components/admin/LoginModal';
 
 const ContentViewer = ({ content, onBack, isAdmin, onEdit }) => {
+    const { user } = useAuth();
+    const { savedContentIds, toggleSaveContent } = useContent();
+    const [showLoginModal, setShowLoginModal] = useState(false);
+
     const IconComponent = CONTENT_TYPES[content.type]?.icon;
     const categoryLabel = CONTENT_CATEGORIES.find(c => c.id === content.category)?.label;
+    const isSaved = savedContentIds.includes(content.id);
+
+    const handleToggleSave = async () => {
+        if (!user) {
+            setShowLoginModal(true);
+            return;
+        }
+        await toggleSaveContent(content.id);
+    };
 
     const formatDate = (dateString) => {
         if (!dateString) return '';
@@ -55,13 +70,19 @@ const ContentViewer = ({ content, onBack, isAdmin, onEdit }) => {
                             <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
                                 <Share2 className="w-5 h-5 text-gray-600" />
                             </button>
-                            <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                                <Bookmark className="w-5 h-5 text-gray-600" />
+                            <button 
+                                onClick={handleToggleSave}
+                                className={`p-2 rounded-lg transition-colors ${isSaved ? 'bg-purple-100 text-[#6A1B9A]' : 'hover:bg-gray-100 text-gray-600'}`}
+                                title={isSaved ? "Remover dos salvos" : "Salvar conteúdo"}
+                            >
+                                <Bookmark className={`w-5 h-5 ${isSaved ? 'fill-current' : ''}`} />
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
 
             {/* Hero Image */}
             {content.image && content.type !== 'ferramenta' && (
