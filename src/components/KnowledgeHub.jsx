@@ -3,12 +3,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Newspaper, Mic, Video, FileSpreadsheet, Filter, Search, Calendar, Clock, 
     ArrowLeft, ExternalLink, Plus, Pencil, LogIn, LogOut, User, Download,
-    BookOpen, GraduationCap, Building2, ArrowRight, Play, ChevronRight, Tag, MessageCircle
+    BookOpen, GraduationCap, Building2, ArrowRight, Play, ChevronRight, Tag, MessageCircle, Users
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useContent, CONTENT_TYPES, CONTENT_CATEGORIES } from '@/contexts/ContentContext';
 import LoginModal from '@/components/admin/LoginModal';
 import ContentEditor from '@/components/admin/ContentEditor';
+import LeadsViewer from '@/components/admin/LeadsViewer';
 import ContentViewer from '@/components/ContentViewer';
 import WaitlistModal from '@/components/ui/WaitlistModal';
 
@@ -21,6 +22,7 @@ const KnowledgeHub = ({ onBack }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showEditor, setShowEditor] = useState(false);
+    const [showLeadsViewer, setShowLeadsViewer] = useState(false);
     const [editingContent, setEditingContent] = useState(null);
     const [viewingContent, setViewingContent] = useState(null);
     const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
@@ -153,10 +155,16 @@ const KnowledgeHub = ({ onBack }) => {
                             ))}
                         </div>
                         {isAdmin && (
-                            <button onClick={handleNewContent} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium hover:bg-green-700">
-                                <Plus className="w-4 h-4" />
-                                <span className="hidden sm:inline">Novo</span>
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button onClick={() => setShowLeadsViewer(true)} className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium hover:bg-purple-200">
+                                    <Users className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Inscritos</span>
+                                </button>
+                                <button onClick={handleNewContent} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium hover:bg-green-700">
+                                    <Plus className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Novo</span>
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -342,6 +350,7 @@ const KnowledgeHub = ({ onBack }) => {
 
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
             <ContentEditor isOpen={showEditor} onClose={() => { setShowEditor(false); setEditingContent(null); }} editingContent={editingContent} />
+            <LeadsViewer isOpen={showLeadsViewer} onClose={() => setShowLeadsViewer(false)} />
             <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
         </div>
     );
