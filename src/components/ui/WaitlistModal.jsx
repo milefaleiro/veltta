@@ -134,13 +134,13 @@ const WaitlistModal = ({ isOpen, onClose }) => {
                                     Inscrição Confirmada!
                                 </h4>
                                 <p className="text-gray-400 text-sm">
-                                    Você receberá um email com condições especiais e 10% de desconto.
+                                    Você receberá um email com condições especiais.
                                 </p>
                             </motion.div>
                         ) : (
                             <>
                                 <p className="text-gray-400 text-sm mb-4">
-                                    Cadastre-se para receber em primeira mão as informações do curso e garantir um <span className="text-purple-400 font-semibold">cupom de 10% de desconto</span>.
+                                    Cadastre-se para receber em primeira mão as informações do curso.
                                 </p>
 
                                 <form onSubmit={handleSubmit} className="space-y-3">

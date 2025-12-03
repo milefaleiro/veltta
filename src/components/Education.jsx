@@ -58,14 +58,6 @@ const Education = () => {
                                 <span className="font-semibold">Início em 26/01/2026</span>
                             </div>
 
-                            <div className="flex items-center gap-4 mb-6">
-                                <span className="text-3xl font-bold text-white">R$ 297</span>
-                                <span className="text-lg text-white/60 line-through">R$ 497</span>
-                                <span className="bg-green-500 text-white text-sm font-bold px-3 py-1 rounded-full">
-                                    40% OFF
-                                </span>
-                            </div>
-
                             <button
                                 onClick={() => setIsWaitlistOpen(true)}
                                 className="w-full py-4 bg-white text-purple-700 font-semibold rounded-xl hover:bg-white/90 transition-all duration-300 flex items-center justify-center gap-2 group"
@@ -75,7 +67,7 @@ const Education = () => {
                             </button>
 
                             <p className="text-center text-white/70 text-sm mt-3">
-                                Receba condições especiais e 10% de desconto
+                                Receba condições especiais
                             </p>
                         </div>
                     </motion.div>
