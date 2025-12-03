@@ -3,13 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Newspaper, Mic, Video, FileSpreadsheet, Filter, Search, Calendar, Clock, 
     ArrowLeft, ExternalLink, Plus, Pencil, LogIn, LogOut, User, Download,
-    BookOpen, GraduationCap, Building2, ArrowRight, Play, ChevronRight, Tag
+    BookOpen, GraduationCap, Building2, ArrowRight, Play, ChevronRight, Tag, MessageCircle
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useContent, CONTENT_TYPES, CONTENT_CATEGORIES } from '@/contexts/ContentContext';
 import LoginModal from '@/components/admin/LoginModal';
 import ContentEditor from '@/components/admin/ContentEditor';
 import ContentViewer from '@/components/ContentViewer';
+import WaitlistModal from '@/components/ui/WaitlistModal';
 
 const KnowledgeHub = ({ onBack }) => {
     const { user, isAdmin, logout } = useAuth();
@@ -22,6 +23,9 @@ const KnowledgeHub = ({ onBack }) => {
     const [showEditor, setShowEditor] = useState(false);
     const [editingContent, setEditingContent] = useState(null);
     const [viewingContent, setViewingContent] = useState(null);
+    const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+
+    const whatsappLink = "https://wa.me/5521972257438?text=Olá! Gostaria de saber mais sobre os treinamentos In Company da Veltta.";
 
     const contentTypes = [
         { id: 'todos', label: 'Todos', icon: Filter },
@@ -279,14 +283,19 @@ const KnowledgeHub = ({ onBack }) => {
                                 </div>
                                 <h3 className="text-2xl font-bold mb-2">Fundamentos de Compras Estratégicas</h3>
                                 <p className="text-white/80 mb-4">Domine os conceitos essenciais e comece sua jornada em procurement com uma metodologia prática e reconhecida pelo mercado.</p>
-                                <div className="flex items-center gap-4 mb-6">
-                                    <span className="text-3xl font-bold">R$ 297</span>
-                                    <span className="text-white/60 line-through">R$ 497</span>
-                                    <span className="bg-green-500 text-white text-xs px-2 py-1 rounded">40% OFF</span>
+                                <div className="flex items-center gap-2 text-white/90 mb-6">
+                                    <Calendar className="w-5 h-5" />
+                                    <span className="font-semibold">Início em 26/01/2026</span>
                                 </div>
-                                <a href="https://hotmart.com/pt-br" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#6A1B9A] rounded-xl font-semibold hover:bg-gray-100 transition-colors">
-                                    Quero me inscrever <ArrowRight className="w-5 h-5" />
-                                </a>
+                                <button
+                                    onClick={() => setIsWaitlistOpen(true)}
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-white text-[#6A1B9A] rounded-xl font-semibold hover:bg-gray-100 transition-colors"
+                                >
+                                    Participar da lista de espera <ArrowRight className="w-5 h-5" />
+                                </button>
+                                <p className="text-white/70 text-sm mt-3">
+                                    Receba condições especiais
+                                </p>
                             </div>
                         </div>
                     </motion.section>
@@ -309,9 +318,18 @@ const KnowledgeHub = ({ onBack }) => {
                                         <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>Workshops práticos</li>
                                         <li className="flex items-center gap-2"><span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>Certificação reconhecida</li>
                                     </ul>
-                                    <a href="#contato" className="inline-flex items-center gap-2 px-6 py-3 bg-amber-400 text-gray-900 rounded-xl font-semibold hover:bg-amber-300 transition-colors">
+                                    <a 
+                                        href={whatsappLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 px-6 py-3 bg-amber-400 text-gray-900 rounded-xl font-semibold hover:bg-amber-300 transition-colors"
+                                    >
+                                        <MessageCircle className="w-5 h-5" />
                                         Solicitar Proposta <ArrowRight className="w-5 h-5" />
                                     </a>
+                                    <p className="text-gray-500 text-sm mt-3">
+                                        Fale diretamente com nossa equipe
+                                    </p>
                                 </div>
                                 <div className="hidden md:block">
                                     <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=600" alt="Treinamento corporativo" className="rounded-xl shadow-2xl" />
@@ -324,6 +342,7 @@ const KnowledgeHub = ({ onBack }) => {
 
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
             <ContentEditor isOpen={showEditor} onClose={() => { setShowEditor(false); setEditingContent(null); }} editingContent={editingContent} />
+            <WaitlistModal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} />
         </div>
     );
 };
