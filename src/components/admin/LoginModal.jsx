@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { X, Mail, Lock, Loader2, AlertCircle, User } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const LoginModal = ({ isOpen, onClose }) => {
-    const { login } = useAuth();
+    const { login, signUp } = useAuth();
+    const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -15,12 +17,19 @@ const LoginModal = ({ isOpen, onClose }) => {
         setError('');
         setIsLoading(true);
 
-        const result = await login(email, password);
+        let result;
+        if (isLogin) {
+            result = await login(email, password);
+        } else {
+            result = await signUp(email, password, name);
+        }
 
         if (result.success) {
             onClose();
             setEmail('');
             setPassword('');
+            setName('');
+            setError('');
         } else {
             setError(result.error);
         }
@@ -49,8 +58,10 @@ const LoginModal = ({ isOpen, onClose }) => {
                     <div className="bg-gradient-to-r from-[#6A1B9A] to-[#4A148C] p-6 text-white">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h2 className="text-xl font-bold">Área Administrativa</h2>
-                                <p className="text-white/70 text-sm mt-1">Acesso restrito</p>
+                                <h2 className="text-xl font-bold">{isLogin ? 'Acesse sua conta' : 'Crie sua conta'}</h2>
+                                <p className="text-white/70 text-sm mt-1">
+                                    {isLogin ? 'Bem-vindo de volta!' : 'Junte-se à nossa comunidade'}
+                                </p>
                             </div>
                             <button
                                 onClick={onClose}
@@ -72,6 +83,25 @@ const LoginModal = ({ isOpen, onClose }) => {
                                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                 {error}
                             </motion.div>
+                        )}
+
+                        {!isLogin && (
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                    Nome Completo
+                                </label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        placeholder="Seu nome"
+                                        required={!isLogin}
+                                        className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#6A1B9A]/20 focus:border-[#6A1B9A] transition-all"
+                                    />
+                                </div>
+                            </div>
                         )}
 
                         <div>
@@ -116,12 +146,25 @@ const LoginModal = ({ isOpen, onClose }) => {
                             {isLoading ? (
                                 <>
                                     <Loader2 className="w-5 h-5 animate-spin" />
-                                    Entrando...
+                                    {isLogin ? 'Entrando...' : 'Criando conta...'}
                                 </>
                             ) : (
-                                'Entrar'
+                                isLogin ? 'Entrar' : 'Criar Conta'
                             )}
                         </button>
+
+                        <div className="text-center">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setIsLogin(!isLogin);
+                                    setError('');
+                                }}
+                                className="text-sm text-[#6A1B9A] hover:underline font-medium"
+                            >
+                                {isLogin ? 'Não tem uma conta? Cadastre-se' : 'Já tem uma conta? Entre'}
+                            </button>
+                        </div>
                     </form>
                 </motion.div>
             </motion.div>

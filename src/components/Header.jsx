@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import VelttaLogo from '@/components/VelttaLogo';
 import { useToast } from '@/components/ui/use-toast';
 
-const Header = () => {
+const Header = ({ onNavigateToHub }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { toast } = useToast();
@@ -92,13 +92,13 @@ const Header = () => {
             </a>
           </li>
           <li>
-            <a
-              href="#comunidade"
-              onClick={(e) => handleLinkClick(e, 'comunidade')}
-              className="hover:text-purple-400 transition-colors text-lg font-medium"
+            <button
+              onClick={onNavigateToHub}
+              className="hover:text-purple-400 transition-colors text-lg font-medium flex items-center gap-2"
             >
-              Comunidade
-            </a>
+              <User className="w-4 h-4" />
+              Área do Aluno
+            </button>
           </li>
         </ul>
 
@@ -159,13 +159,16 @@ const Header = () => {
                 </a>
               </li>
               <li>
-                <a
-                  href="#comunidade"
-                  onClick={(e) => handleLinkClick(e, 'comunidade')}
-                  className="hover:text-purple-400 transition-colors"
+                <button
+                  onClick={() => {
+                    onNavigateToHub();
+                    setIsOpen(false);
+                  }}
+                  className="hover:text-purple-400 transition-colors flex items-center gap-2"
                 >
-                  Comunidade
-                </a>
+                  <User className="w-6 h-6" />
+                  Área do Aluno
+                </button>
               </li>
             </ul>
             <Button

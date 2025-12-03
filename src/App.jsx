@@ -67,7 +67,7 @@ function App() {
           <meta name="description" content="A Veltta capacita empresas com consultoria em compras, seleção de software, PDMS e analytics, além de programas de educação e uma comunidade exclusiva." />
         </Helmet>
         <div className="min-h-screen">
-          <Header />
+          <Header onNavigateToHub={navigateToContentPage} />
           <main>
             <Hero />
             <Services />
