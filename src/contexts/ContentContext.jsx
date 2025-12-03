@@ -118,6 +118,7 @@ export const ContentProvider = ({ children }) => {
     }, [user]);
 
     const fetchSavedContents = async () => {
+        if (!user) return;
         try {
             const { data, error } = await supabase
                 .from('saved_contents')
@@ -139,7 +140,8 @@ export const ContentProvider = ({ children }) => {
                 const { error } = await supabase
                     .from('saved_contents')
                     .delete()
-                    .match({ user_id: user.id, content_id: contentId });
+                    .eq('user_id', user.id)
+                    .eq('content_id', contentId);
                 
                 if (error) throw error;
                 setSavedContentIds(prev => prev.filter(id => id !== contentId));
@@ -147,7 +149,8 @@ export const ContentProvider = ({ children }) => {
             } else {
                 const { error } = await supabase
                     .from('saved_contents')
-                    .insert({ user_id: user.id, content_id: contentId });
+                    .insert({ user_id: user.id, content_id: contentId })
+                    .select();
                 
                 if (error) throw error;
                 setSavedContentIds(prev => [...prev, contentId]);

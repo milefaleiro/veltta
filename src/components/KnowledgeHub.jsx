@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useContent, CONTENT_TYPES, CONTENT_CATEGORIES } from '@/contexts/ContentContext';
+import { useToast } from '@/components/ui/use-toast';
 import LoginModal from '@/components/admin/LoginModal';
 import ContentEditor from '@/components/admin/ContentEditor';
 import LeadsViewer from '@/components/admin/LeadsViewer';
@@ -16,6 +17,7 @@ import WaitlistModal from '@/components/ui/WaitlistModal';
 const KnowledgeHub = ({ onBack }) => {
     const { user, isAdmin, logout } = useAuth();
     const { contents, isLoading, savedContentIds, toggleSaveContent } = useContent();
+    const { toast } = useToast();
     
     const [activeFilter, setActiveFilter] = useState('todos');
     const [activeCategory, setActiveCategory] = useState('todos');
@@ -90,7 +92,20 @@ const KnowledgeHub = ({ onBack }) => {
             setShowLoginModal(true);
             return;
         }
-        await toggleSaveContent(contentId);
+        const result = await toggleSaveContent(contentId);
+        if (result?.error) {
+            toast({
+                title: "Erro",
+                description: "Não foi possível salvar o conteúdo.",
+                variant: "destructive",
+            });
+        } else {
+            toast({
+                title: result?.saved ? "Salvo!" : "Removido!",
+                description: result?.saved ? "Conteúdo adicionado aos seus salvos." : "Conteúdo removido dos seus salvos.",
+                duration: 2000,
+            });
+        }
     };
 
     if (viewingContent) {
