@@ -11,6 +11,7 @@ import Content from '@/components/Content';
 import Community from '@/components/Community';
 import Footer from '@/components/Footer';
 import KnowledgeHub from '@/components/KnowledgeHub';
+import CoCreatePage from '@/components/CoCreatePage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -20,8 +21,10 @@ function App() {
     const handleHashChange = () => {
       if (window.location.hash === '#conteudos') {
         setCurrentPage('conteudos');
-      } else if (window.location.hash === '' || window.location.hash === '#' || !window.location.hash.includes('conteudos')) {
-        if (currentPage === 'conteudos') {
+      } else if (window.location.hash === '#cocrie') {
+        setCurrentPage('cocrie');
+      } else if (window.location.hash === '' || window.location.hash === '#' || (!window.location.hash.includes('conteudos') && !window.location.hash.includes('cocrie'))) {
+        if (currentPage === 'conteudos' || currentPage === 'cocrie') {
           setCurrentPage('home');
         }
       }
@@ -43,6 +46,21 @@ function App() {
     setCurrentPage('home');
     window.scrollTo(0, 0);
   };
+
+  if (currentPage === 'cocrie') {
+    return (
+      <AuthProvider>
+        <ContentProvider>
+          <Helmet>
+            <title>Co-crie com a Veltta</title>
+            <meta name="description" content="Contribua com ideias e sugestões para a comunidade Veltta." />
+          </Helmet>
+          <CoCreatePage onBack={navigateToContentPage} />
+          <Toaster />
+        </ContentProvider>
+      </AuthProvider>
+    );
+  }
 
   if (currentPage === 'conteudos') {
     return (

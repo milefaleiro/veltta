@@ -34,11 +34,12 @@ const LeadsViewer = ({ isOpen, onClose }) => {
     const filteredLeads = leads.filter(lead =>
         lead.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         lead.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lead.company?.toLowerCase().includes(searchTerm.toLowerCase())
+        lead.company?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        lead.message?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const exportToCSV = () => {
-        const headers = ['Nome', 'Email', 'Telefone', 'Empresa', 'Cargo', 'Data'];
+        const headers = ['Nome', 'Email', 'Telefone', 'Empresa', 'Cargo', 'Origem', 'Mensagem', 'Data'];
         const csvContent = [
             headers.join(','),
             ...filteredLeads.map(lead => [
@@ -47,6 +48,8 @@ const LeadsViewer = ({ isOpen, onClose }) => {
                 `"${lead.phone || ''}"`,
                 `"${lead.company || ''}"`,
                 `"${lead.position || ''}"`,
+                `"${lead.source || ''}"`,
+                `"${(lead.message || '').replace(/"/g, '""')}"`,
                 `"${new Date(lead.created_at).toLocaleDateString('pt-BR')}"`
             ].join(','))
         ].join('\n');
@@ -83,9 +86,9 @@ const LeadsViewer = ({ isOpen, onClose }) => {
                                 <Users className="w-5 h-5 text-purple-700" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-gray-900">Lista de Espera</h2>
+                                <h2 className="text-xl font-bold text-gray-900">Leads e Sugestões</h2>
                                 <p className="text-sm text-gray-500">
-                                    {leads.length} inscritos no total
+                                    {leads.length} registros no total
                                 </p>
                             </div>
                         </div>
@@ -141,6 +144,11 @@ const LeadsViewer = ({ isOpen, onClose }) => {
                                                     <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
                                                         {new Date(lead.created_at).toLocaleDateString('pt-BR')}
                                                     </span>
+                                                    {lead.source === 'co_create' && (
+                                                        <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                                                            Co-criação
+                                                        </span>
+                                                    )}
                                                 </h3>
                                                 <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-600">
                                                     <div className="flex items-center gap-1.5">
@@ -154,6 +162,12 @@ const LeadsViewer = ({ isOpen, onClose }) => {
                                                         </div>
                                                     )}
                                                 </div>
+                                                {lead.message && (
+                                                    <div className="mt-3 p-3 bg-gray-50 rounded-lg text-sm text-gray-700 border border-gray-100">
+                                                        <span className="font-medium text-gray-900 block mb-1">Mensagem:</span>
+                                                        {lead.message}
+                                                    </div>
+                                                )}
                                             </div>
                                             
                                             {(lead.company || lead.position) && (

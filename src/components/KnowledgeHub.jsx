@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
     Newspaper, Mic, Video, FileSpreadsheet, Filter, Search, Calendar, Clock, 
     ArrowLeft, ExternalLink, Plus, Pencil, LogIn, LogOut, User, Download,
-    BookOpen, GraduationCap, Building2, ArrowRight, Play, ChevronRight, Tag, MessageCircle, Users, Bookmark
+    BookOpen, GraduationCap, Building2, ArrowRight, Play, ChevronRight, Tag, MessageCircle, Users, Bookmark, Lightbulb
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useContent, CONTENT_TYPES, CONTENT_CATEGORIES } from '@/contexts/ContentContext';
@@ -188,18 +188,27 @@ const KnowledgeHub = ({ onBack }) => {
                                 </button>
                             ))}
                         </div>
-                        {isAdmin && (
-                            <div className="flex items-center gap-2">
-                                <button onClick={() => setShowLeadsViewer(true)} className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium hover:bg-purple-200">
-                                    <Users className="w-4 h-4" />
-                                    <span className="hidden sm:inline">Inscritos</span>
-                                </button>
-                                <button onClick={handleNewContent} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium hover:bg-green-700">
-                                    <Plus className="w-4 h-4" />
-                                    <span className="hidden sm:inline">Novo</span>
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex items-center gap-2">
+                            <button 
+                                onClick={() => window.location.hash = 'cocrie'} 
+                                className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-medium hover:bg-amber-200 transition-colors"
+                            >
+                                <Lightbulb className="w-4 h-4" />
+                                <span className="hidden sm:inline">Co-crie com a Veltta</span>
+                            </button>
+                            {isAdmin && (
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => setShowLeadsViewer(true)} className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium hover:bg-purple-200">
+                                        <Users className="w-4 h-4" />
+                                        <span className="hidden sm:inline">Inscritos</span>
+                                    </button>
+                                    <button onClick={handleNewContent} className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium hover:bg-green-700">
+                                        <Plus className="w-4 h-4" />
+                                        <span className="hidden sm:inline">Novo</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
