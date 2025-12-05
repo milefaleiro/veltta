@@ -96,15 +96,12 @@ const CoCreatePage = ({ onBack }) => {
                 throw voteError;
             }
 
-            // Update vote count
-            const suggestion = suggestions.find(s => s.id === suggestionId);
-            if (suggestion) {
-                const { error: updateError } = await supabase
-                    .from('cocreate_suggestions')
-                    .update({ votes: (suggestion.votes || 0) + 1 })
-                    .eq('id', suggestionId);
-                
-                if (updateError) throw updateError;
+            // Increment vote count using RPC function (bypasses RLS)
+            const { error: rpcError } = await supabase
+                .rpc('increment_suggestion_votes', { suggestion_uuid: suggestionId });
+            
+            if (rpcError) {
+                console.error('RPC error:', rpcError);
             }
 
             // Update local state
