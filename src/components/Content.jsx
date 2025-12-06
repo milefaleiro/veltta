@@ -76,7 +76,7 @@ const Content = ({ onViewAll }) => {
                             {/* Large Image Top */}
                             <div className="col-span-2 rounded-2xl overflow-hidden shadow-lg h-64 md:h-80">
                                 <img
-                                    src="https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=800&auto=format&fit=crop&q=60"
+                                    src="/content_top.jpg"
                                     alt="Podcast Setup"
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                                 />
@@ -84,7 +84,7 @@ const Content = ({ onViewAll }) => {
                             {/* Small Image 1 */}
                             <div className="rounded-2xl overflow-hidden shadow-lg h-48 md:h-56">
                                 <img
-                                    src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&auto=format&fit=crop&q=60"
+                                    src="/content_bottom_left.jpg"
                                     alt="Digital Content"
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                                 />
@@ -92,7 +92,7 @@ const Content = ({ onViewAll }) => {
                             {/* Small Image 2 */}
                             <div className="rounded-2xl overflow-hidden shadow-lg h-48 md:h-56">
                                 <img
-                                    src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=500&auto=format&fit=crop&q=60"
+                                    src="/content_bottom_right.jpg"
                                     alt="Analytics Content"
                                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                                 />

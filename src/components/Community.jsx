@@ -36,7 +36,7 @@ const Community = () => {
           <div className="flex-1 relative">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
               <img
-                src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&auto=format&fit=crop&q=60"
+                src="/community_wa.jpg"
                 alt="Comunidade WhatsApp"
                 className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700"
               />
