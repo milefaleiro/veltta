@@ -10,11 +10,6 @@ const Services = () => {
             description: "Diagnóstico e redesenho completo da função de Compras — estratégia, processos, KPIs e governança."
         },
         {
-            icon: Settings,
-            title: "Software Selection",
-            description: "Apoio técnico e metodológico para escolher, comparar e implantar soluções de Procurement, SRM e e-Sourcing."
-        },
-        {
             icon: Database,
             title: "PDMS — Padronização de Descrições",
             description: "Organização e estruturação de cadastros de materiais e serviços, com saneamento, categorização e criação de taxonomias."
@@ -55,7 +50,7 @@ const Services = () => {
                     </p>
                 </motion.div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
                     {services.map((service, index) => (
                         <motion.div
                             key={index}
