@@ -44,13 +44,16 @@ const Header = ({ onNavigate, currentPage = 'home' }) => {
 
   const isActive = (page) => currentPage === page;
 
+  // Header sempre tem fundo escuro exceto na home (onde pode ser transparente no topo)
+  const shouldHaveDarkBg = currentPage !== 'home' || isScrolled;
+
   return (
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 120, damping: 20 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-[#0B0B0F]/90 backdrop-blur-sm shadow-lg' : 'bg-transparent'
+        shouldHaveDarkBg ? 'bg-[#0B0B0F]/95 backdrop-blur-sm shadow-lg' : 'bg-transparent'
       }`}
     >
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
