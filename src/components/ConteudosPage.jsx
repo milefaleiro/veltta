@@ -98,9 +98,9 @@ const ConteudosPage = ({ onNavigate }) => {
                 {/* Filters Section */}
                 <section className="py-8 bg-white border-b">
                     <div className="container mx-auto px-4">
-                        <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                        <div className="flex flex-col gap-6">
                             {/* Search */}
-                            <div className="relative w-full md:w-96">
+                            <div className="relative w-full">
                                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                                 <input
                                     type="text"
@@ -111,68 +111,70 @@ const ConteudosPage = ({ onNavigate }) => {
                                 />
                             </div>
 
-                            {/* Type Filter */}
-                            <div className="flex items-center gap-2 flex-wrap">
-                                <Filter className="w-5 h-5 text-gray-400" />
-                                <button
-                                    onClick={() => setSelectedType('all')}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedType === 'all'
+                            <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                                {/* Type Filter */}
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    <Filter className="w-5 h-5 text-gray-400" />
+                                    <button
+                                        onClick={() => setSelectedType('all')}
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedType === 'all'
                                             ? 'bg-purple-600 text-white'
                                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
-                                >
-                                    Todos
-                                </button>
-                                {Object.entries(CONTENT_TYPES).map(([key, value]) => (
-                                    <button
-                                        key={key}
-                                        onClick={() => setSelectedType(key)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${selectedType === key
-                                                ? 'bg-purple-600 text-white'
-                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                             }`}
                                     >
-                                        <value.icon className="w-4 h-4" />
-                                        {value.label}
+                                        Todos
                                     </button>
-                                ))}
-                            </div>
-
-                            {/* User Controls */}
-                            <div className="flex items-center gap-3 border-l pl-4 md:ml-auto">
-                                {user ? (
-                                    <>
+                                    {Object.entries(CONTENT_TYPES).map(([key, value]) => (
                                         <button
-                                            onClick={() => setShowSavedOnly(!showSavedOnly)}
-                                            className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors ${showSavedOnly
-                                                    ? 'bg-[#6A1B9A] text-white'
-                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                            key={key}
+                                            onClick={() => setSelectedType(key)}
+                                            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${selectedType === key
+                                                ? 'bg-purple-600 text-white'
+                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                                 }`}
                                         >
-                                            <Bookmark className={`w-4 h-4 ${showSavedOnly ? 'fill-current' : ''}`} />
-                                            <span className="hidden sm:inline">Meus Salvos</span>
+                                            <value.icon className="w-4 h-4" />
+                                            {value.label}
                                         </button>
-                                        <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-full text-sm text-gray-700">
-                                            <User className="w-4 h-4" />
-                                            <span className="hidden lg:inline">{user?.user_metadata?.name || user?.email?.split('@')[0]}</span>
-                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* User Controls */}
+                                <div className="flex items-center gap-3 border-l pl-4 md:ml-auto">
+                                    {user ? (
+                                        <>
+                                            <button
+                                                onClick={() => setShowSavedOnly(!showSavedOnly)}
+                                                className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors ${showSavedOnly
+                                                    ? 'bg-[#6A1B9A] text-white'
+                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                    }`}
+                                            >
+                                                <Bookmark className={`w-4 h-4 ${showSavedOnly ? 'fill-current' : ''}`} />
+                                                <span className="hidden sm:inline">Meus Salvos</span>
+                                            </button>
+                                            <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-full text-sm text-gray-700">
+                                                <User className="w-4 h-4" />
+                                                <span className="hidden lg:inline">{user?.user_metadata?.name || user?.email?.split('@')[0]}</span>
+                                            </div>
+                                            <button
+                                                onClick={logout}
+                                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                                title="Sair"
+                                            >
+                                                <LogOut className="w-4 h-4" />
+                                            </button>
+                                        </>
+                                    ) : (
                                         <button
-                                            onClick={logout}
-                                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
-                                            title="Sair"
+                                            onClick={() => setShowLoginModal(true)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-full text-sm font-medium transition-colors shadow-sm"
                                         >
-                                            <LogOut className="w-4 h-4" />
+                                            <LogIn className="w-4 h-4" />
+                                            <span>Entrar</span>
                                         </button>
-                                    </>
-                                ) : (
-                                    <button
-                                        onClick={() => setShowLoginModal(true)}
-                                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-full text-sm font-medium transition-colors shadow-sm"
-                                    >
-                                        <LogIn className="w-4 h-4" />
-                                        <span>Entrar</span>
-                                    </button>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -218,8 +220,8 @@ const ConteudosPage = ({ onNavigate }) => {
                                                 <button
                                                     onClick={(e) => handleToggleSave(e, item.id)}
                                                     className={`absolute top-4 right-4 p-2 rounded-lg shadow-sm transition-all duration-300 z-10 ${savedContentIds.includes(item.id)
-                                                            ? 'bg-[#6A1B9A] text-white opacity-100'
-                                                            : 'bg-white/90 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-[#6A1B9A] hover:bg-white'
+                                                        ? 'bg-[#6A1B9A] text-white opacity-100'
+                                                        : 'bg-white/90 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-[#6A1B9A] hover:bg-white'
                                                         }`}
                                                     title={savedContentIds.includes(item.id) ? "Remover dos salvos" : "Salvar conteúdo"}
                                                 >
