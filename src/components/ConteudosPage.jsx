@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Newspaper, Mic, Video, Clock, Search, Filter, LogIn, LogOut, User, Bookmark, Play } from 'lucide-react';
+import { ArrowLeft, Newspaper, Mic, Video, Clock, Search, Filter, LogIn, LogOut, User, Bookmark, Play, Plus, Pencil, Users } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { useContent, CONTENT_TYPES } from '@/contexts/ContentContext';
 import LoginModal from '@/components/admin/LoginModal';
+import ContentEditor from '@/components/admin/ContentEditor';
+import LeadsViewer from '@/components/admin/LeadsViewer';
 
 const ConteudosPage = ({ onNavigate }) => {
-    const { user, logout } = useAuth();
+    const { user, isAdmin, logout } = useAuth();
     const { toast } = useToast();
     const { contents, savedContentIds, toggleSaveContent } = useContent();
 
@@ -17,6 +19,9 @@ const ConteudosPage = ({ onNavigate }) => {
     const [selectedType, setSelectedType] = useState('all');
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showSavedOnly, setShowSavedOnly] = useState(false);
+    const [showEditor, setShowEditor] = useState(false);
+    const [showLeadsViewer, setShowLeadsViewer] = useState(false);
+    const [editingContent, setEditingContent] = useState(null);
 
     const filteredContents = contents.filter(item => {
         const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -139,6 +144,26 @@ const ConteudosPage = ({ onNavigate }) => {
                                     ))}
                                 </div>
 
+                                {/* Admin Controls */}
+                                {isAdmin && (
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setShowLeadsViewer(true)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors"
+                                        >
+                                            <Users className="w-4 h-4" />
+                                            <span className="hidden sm:inline">Inscritos</span>
+                                        </button>
+                                        <button
+                                            onClick={() => { setEditingContent(null); setShowEditor(true); }}
+                                            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium hover:bg-green-700 transition-colors"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                            <span className="hidden sm:inline">Novo</span>
+                                        </button>
+                                    </div>
+                                )}
+
                                 {/* User Controls */}
                                 <div className="flex items-center gap-3 border-l pl-4 md:ml-auto">
                                     {user ? (
@@ -206,6 +231,16 @@ const ConteudosPage = ({ onNavigate }) => {
                                                     alt={item.title}
                                                     src={item.image}
                                                 />
+                                                {/* Admin Edit Button */}
+                                                {isAdmin && (
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setEditingContent(item); setShowEditor(true); }}
+                                                        className="absolute top-4 left-1/2 -translate-x-1/2 p-2 bg-white/90 rounded-lg shadow opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-white"
+                                                        title="Editar conteúdo"
+                                                    >
+                                                        <Pencil className="w-4 h-4 text-gray-600" />
+                                                    </button>
+                                                )}
                                                 {item.type === 'video' && (
                                                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                                         <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
@@ -278,6 +313,12 @@ const ConteudosPage = ({ onNavigate }) => {
 
             <Footer />
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
+            <ContentEditor 
+                isOpen={showEditor} 
+                onClose={() => { setShowEditor(false); setEditingContent(null); }} 
+                editingContent={editingContent} 
+            />
+            <LeadsViewer isOpen={showLeadsViewer} onClose={() => setShowLeadsViewer(false)} />
         </div>
     );
 };
