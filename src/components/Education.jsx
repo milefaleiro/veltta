@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Building, GraduationCap, Calendar, ArrowRight, MessageCircle } from 'lucide-react';
+import { Building, Users } from 'lucide-react';
 import WaitlistModal from '@/components/ui/WaitlistModal';
 
 const Education = () => {
@@ -27,113 +27,50 @@ const Education = () => {
                     </p>
                 </motion.div>
 
-                <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-                    {/* Card Curso Online */}
+                <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                    {/* Card In Company */}
                     <motion.div
-                        initial={{ opacity: 0, y: 40 }}
+                        initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.5 }}
-                        transition={{ duration: 0.6 }}
-                        className="relative overflow-hidden rounded-2xl"
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                        className="bg-[#111116] border border-gray-800 p-10 rounded-2xl flex flex-col items-center text-center hover:border-purple-500/50 transition-colors duration-300"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-purple-700 to-pink-600" />
-                        <div className="relative p-8 flex flex-col h-full">
-                            <div className="flex items-center gap-3 mb-4">
-                                <GraduationCap className="w-6 h-6 text-white/80" />
-                                <span className="text-sm font-medium bg-white/20 px-3 py-1 rounded-full">
-                                    Curso Online
-                                </span>
-                            </div>
-                            
-                            <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                                Fundamentos de Compras Estratégicas
-                            </h3>
-                            
-                            <p className="text-white/80 leading-relaxed mb-6 flex-grow">
-                                Domine os conceitos essenciais e comece sua jornada em procurement com uma metodologia prática e reconhecida pelo mercado.
-                            </p>
-
-                            <div className="flex items-center gap-2 text-white/90 mb-6">
-                                <Calendar className="w-5 h-5" />
-                                <span className="font-semibold">Início em 26/01/2026</span>
-                            </div>
-
-                            <button
-                                onClick={() => setIsWaitlistOpen(true)}
-                                className="w-full py-4 bg-white text-purple-700 font-semibold rounded-xl hover:bg-white/90 transition-all duration-300 flex items-center justify-center gap-2 group"
-                            >
-                                Participar da lista de espera
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </button>
-
-                            <p className="text-center text-white/70 text-sm mt-3">
-                                Receba condições especiais
-                            </p>
+                        <div className="w-16 h-16 rounded-2xl bg-[#1A1A23] flex items-center justify-center mb-6 text-purple-500">
+                            <Building className="w-8 h-8" />
+                        </div>
+                        <h3 className="text-2xl font-bold text-white mb-4">In Company</h3>
+                        <p className="text-gray-400 leading-relaxed mb-8">
+                            Treinamentos personalizados para as necessidades específicas da sua empresa, entregues por nossos especialistas.
+                        </p>
+                        <div className="mt-auto">
+                            {/* Button can be added here or strictly text card? content indicates clickable or just info? Keeping it simple as per screenshot. */}
                         </div>
                     </motion.div>
 
-                    {/* Card In Company */}
+                    {/* Card Cursos Livres */}
                     <motion.div
-                        initial={{ opacity: 0, y: 40 }}
+                        initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true, amount: 0.5 }}
-                        transition={{ duration: 0.6, delay: 0.2 }}
-                        className="relative overflow-hidden rounded-2xl"
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="bg-[#111116] border border-gray-800 p-10 rounded-2xl flex flex-col items-center text-center hover:border-purple-500/50 transition-colors duration-300"
                     >
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#2a2a2a] to-[#1a1a2e]" />
-                        <div className="absolute inset-0 border border-white/10 rounded-2xl" />
-                        <div className="relative p-8 flex flex-col h-full">
-                            <div className="flex items-center gap-3 mb-4">
-                                <Building className="w-6 h-6 text-purple-400" />
-                                <span className="text-sm font-medium bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full">
-                                    Soluções Corporativas
-                                </span>
-                            </div>
-                            
-                            <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                                Turmas In Company
-                            </h3>
-                            
-                            <p className="text-gray-400 leading-relaxed mb-6 flex-grow">
-                                Treinamentos personalizados para as necessidades específicas da sua empresa. Desenvolvemos programas sob medida com nossos especialistas para capacitar suas equipes de compras e supply chain.
-                            </p>
-
-                            <ul className="space-y-3 mb-8 text-gray-300">
-                                <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
-                                    Conteúdo personalizado
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
-                                    Cases da sua empresa
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <span className="w-1.5 h-1.5 bg-purple-400 rounded-full" />
-                                    Certificação inclusa
-                                </li>
-                            </ul>
-
-                            <button
-                                onClick={handleWhatsAppClick}
-                                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold rounded-xl hover:opacity-90 transition-all duration-300 flex items-center justify-center gap-2 group"
-                            >
-                                <MessageCircle className="w-5 h-5" />
-                                Solicite uma proposta
-                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                            </button>
-
-                            <p className="text-center text-gray-500 text-sm mt-3">
-                                Fale diretamente com nossa equipe
-                            </p>
+                        <div className="w-16 h-16 rounded-2xl bg-[#1A1A23] flex items-center justify-center mb-6 text-purple-500">
+                            <Users className="w-8 h-8" />
                         </div>
+                        <h3 className="text-2xl font-bold text-white mb-4">Cursos Livres</h3>
+                        <p className="text-gray-400 leading-relaxed mb-8">
+                            Oportunidades para profissionais de diversas empresas trocarem experiências e aprenderem juntos.
+                        </p>
                     </motion.div>
                 </div>
             </div>
 
             {/* Modal de Lista de Espera */}
-            <WaitlistModal 
-                isOpen={isWaitlistOpen} 
-                onClose={() => setIsWaitlistOpen(false)} 
+            <WaitlistModal
+                isOpen={isWaitlistOpen}
+                onClose={() => setIsWaitlistOpen(false)}
             />
         </section>
     );

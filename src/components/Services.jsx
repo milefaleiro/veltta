@@ -1,23 +1,28 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { GitBranch, Puzzle, BarChart } from 'lucide-react';
+import { GitBranch, Puzzle, BarChart, Settings, Database } from 'lucide-react';
 
 const Services = () => {
     const services = [
         {
             icon: GitBranch,
             title: "Procurement Transformation",
-            description: "Reestruturamos sua área de compras com foco em estratégia, eficiência e geração de valor para o negócio."
+            description: "Diagnóstico e redesenho completo da função de Compras — estratégia, processos, KPIs e governança."
         },
         {
-            icon: Puzzle,
-            title: "PDMS",
-            description: "Implementamos e otimizamos a gestão de dados mestres de produtos para garantir consistência e qualidade."
+            icon: Settings,
+            title: "Software Selection",
+            description: "Apoio técnico e metodológico para escolher, comparar e implantar soluções de Procurement, SRM e e-Sourcing."
+        },
+        {
+            icon: Database,
+            title: "PDMS — Padronização de Descrições",
+            description: "Organização e estruturação de cadastros de materiais e serviços, com saneamento, categorização e criação de taxonomias."
         },
         {
             icon: BarChart,
             title: "Analytics",
-            description: "Transformamos seus dados de compras em insights acionáveis para tomadas de decisão mais inteligentes."
+            description: "Desenvolvimento de painéis e análises de Spend, fornecedores e performance."
         }
     ];
 
@@ -50,7 +55,7 @@ const Services = () => {
                     </p>
                 </motion.div>
 
-                <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                     {services.map((service, index) => (
                         <motion.div
                             key={index}
@@ -59,16 +64,23 @@ const Services = () => {
                             whileInView="visible"
                             viewport={{ once: true, amount: 0.3 }}
                             variants={cardVariants}
-                            className="bg-gray-50 p-8 rounded-2xl hover:bg-white hover:shadow-xl hover:-translate-y-2 transition-all duration-300 border border-gray-100 group"
+                            className="bg-white p-8 rounded-xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 text-center group h-full flex flex-col items-center"
                         >
-                            <div className="w-16 h-16 gradient-purple rounded-xl flex items-center justify-center mb-6 group-hover:scale-105 transition-transform duration-300">
-                                <service.icon className="w-8 h-8 text-white" />
+                            <div className="w-16 h-16 rounded-full bg-purple-50 flex items-center justify-center mb-6 group-hover:bg-[#6A1B9A] transition-colors duration-300">
+                                <service.icon className="w-7 h-7 text-[#6A1B9A] group-hover:text-white transition-colors duration-300" />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">{service.title}</h3>
-                            <p className="text-gray-600 leading-relaxed">{service.description}</p>
+                            <h3 className="text-xl font-bold text-gray-900 mb-4 h-14 flex items-center justify-center">{service.title}</h3>
+                            <p className="text-gray-600 text-sm leading-relaxed">{service.description}</p>
+
+                            <div className="mt-auto pt-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div className="w-8 h-8 rounded-lg border border-purple-200 flex items-center justify-center mx-auto">
+                                    <div className="w-2 h-2 bg-[#6A1B9A] rounded-full"></div>
+                                </div>
+                            </div>
                         </motion.div>
                     ))}
                 </div>
+
             </div>
         </section>
     );

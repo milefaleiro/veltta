@@ -11,32 +11,39 @@ const Community = () => {
   };
 
   return (
-    <section id="comunidade" className="py-24 bg-white">
+    <section className="bg-[#0B0B0F] py-24">
       <div className="container mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 1 }}
-          className="gradient-purple rounded-2xl p-8 md:p-16 text-white text-center relative overflow-hidden glow-purple"
-        >
-          <div className="relative z-10">
-            <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <MessageCircle className="w-10 h-10 text-white" />
+        <div className="flex flex-col md:flex-row items-center gap-12 max-w-6xl mx-auto">
+          <div className="flex-1">
+            <div className="w-12 h-12 rounded-full border border-purple-500/30 flex items-center justify-center mb-6">
+              <MessageCircle className="w-6 h-6 text-purple-500" />
             </div>
-            <h2 className="text-3xl md:text-5xl font-bold mb-4">Comunidade de Compradores</h2>
-            <p className="text-lg md:text-xl text-white/80 mb-10 max-w-3xl mx-auto">
-              Junte-se a centenas de profissionais de compras no WhatsApp para trocar experiências, tirar dúvidas e acelerar sua carreira.
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Comunidade de <span className="text-purple-500">Compradores</span>
+            </h2>
+            <p className="text-gray-400 text-lg mb-8 leading-relaxed">
+              Junte-se a um espaço gratuito e exclusivo no WhatsApp para troca de experiências, networking e discussões valiosas com outros profissionais de compras.
             </p>
-            <Button
-              onClick={handleJoin}
-              className="bg-white text-[#6A1B9A] hover:bg-gray-100 font-bold text-lg px-10 py-7 rounded-full hover:scale-105 transition-transform group"
+            <a
+              href="https://chat.whatsapp.com/..."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[#8E24AA] text-white font-semibold rounded-lg hover:bg-[#7B1FA2] transition-colors"
             >
-              Entrar na comunidade
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
+              Quero Fazer Parte <ArrowRight className="w-5 h-5" />
+            </a>
           </div>
-        </motion.div>
+          <div className="flex-1 relative">
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&auto=format&fit=crop&q=60"
+                alt="Comunidade WhatsApp"
+                className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#0B0B0F]/20 to-transparent"></div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

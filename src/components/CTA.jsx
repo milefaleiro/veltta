@@ -1,49 +1,32 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/components/ui/use-toast';
-import { ArrowRight } from 'lucide-react';
 
 const CTA = () => {
-  const { toast } = useToast();
-
-  const handleDemo = () => {
-    toast({
-      title: "🎉 Solicitação recebida!",
-      description: "Nossa equipe entrará em contato em breve para agendar sua demonstração gratuita!",
-    });
-  };
-
   return (
-    <section className="py-24 relative overflow-hidden">
-      <div className="absolute inset-0 gradient-green" />
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-black rounded-full blur-3xl" />
-      </div>
-
-      <div className="container mx-auto px-4 relative z-10">
+    <section className="py-20 bg-[#6A1B9A] text-white text-center">
+      <div className="container mx-auto px-4">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="text-center max-w-4xl mx-auto"
+          transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 text-black">
-            Planeje o futuro do seu posto com precisão.
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Pronto Para Transformar Sua Área de Compras?
           </h2>
-          <p className="text-xl md:text-2xl text-black/80 mb-10">
-            Descubra como a inteligência de dados pode transformar sua operação e aumentar sua lucratividade.
+          <p className="text-white/80 text-lg mb-8 max-w-2xl mx-auto">
+            Entre em contato conosco e descubra como podemos ajudar você ou sua empresa a alcançar resultados extraordinários em procurement.
           </p>
-          <Button
-            onClick={handleDemo}
-            className="bg-black text-white hover:bg-black/90 font-semibold text-lg px-10 py-7 rounded-full hover:scale-105 transition-all shadow-2xl group"
+          <a
+            href="https://wa.me/5521972257438"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block px-8 py-4 bg-white text-[#6A1B9A] font-bold rounded-lg hover:bg-gray-100 transition-colors shadow-lg"
           >
-            Solicitar demonstração gratuita
-            <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </Button>
-          <p className="text-black/70 mt-6 text-sm">
-            Sem compromisso • Demonstração de 30 minutos • Suporte em português
+            Agende uma Conversa
+          </a>
+          <p className="text-white/60 text-sm mt-4">
+            Resposta em até 24 horas úteis
           </p>
         </motion.div>
       </div>

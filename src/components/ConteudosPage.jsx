@@ -1,24 +1,55 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Newspaper, Mic, Video, Clock, Search, Filter } from 'lucide-react';
+import { ArrowLeft, Newspaper, Mic, Video, Clock, Search, Filter, LogIn, LogOut, User, Bookmark, Play } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 import { useContent, CONTENT_TYPES } from '@/contexts/ContentContext';
+import LoginModal from '@/components/admin/LoginModal';
 
 const ConteudosPage = ({ onNavigate }) => {
-    const { contents } = useContent();
+    const { user, logout } = useAuth();
+    const { toast } = useToast();
+    const { contents, savedContentIds, toggleSaveContent } = useContent();
+
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedType, setSelectedType] = useState('all');
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [showSavedOnly, setShowSavedOnly] = useState(false);
 
     const filteredContents = contents.filter(item => {
         const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
+            (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()));
         const matchesType = selectedType === 'all' || item.type === selectedType;
-        return matchesSearch && matchesType;
+        const matchesSaved = !showSavedOnly || savedContentIds.includes(item.id);
+        return matchesSearch && matchesType && matchesSaved;
     });
 
+    const handleToggleSave = async (e, contentId) => {
+        e.stopPropagation();
+        if (!user) {
+            setShowLoginModal(true);
+            return;
+        }
+        const result = await toggleSaveContent(contentId);
+        if (result?.error) {
+            toast({
+                title: "Erro",
+                description: "Não foi possível salvar o conteúdo.",
+                variant: "destructive",
+            });
+        } else {
+            toast({
+                title: result?.saved ? "Salvo!" : "Removido!",
+                description: result?.saved ? "Conteúdo adicionado aos seus salvos." : "Conteúdo removido dos seus salvos.",
+                duration: 2000,
+            });
+        }
+    };
+
     const getTypeBadgeStyle = (type) => {
-        switch(type) {
+        switch (type) {
             case 'artigo': return 'bg-blue-100 text-blue-700';
             case 'podcast': return 'bg-purple-100 text-purple-700';
             case 'live': return 'bg-red-100 text-red-700';
@@ -33,7 +64,7 @@ const ConteudosPage = ({ onNavigate }) => {
     return (
         <div className="min-h-screen bg-gray-50">
             <Header onNavigate={onNavigate} currentPage="conteudos" />
-            
+
             <main className="pt-24">
                 {/* Hero Section */}
                 <section className="py-16 bg-gradient-to-br from-[#0B0B0F] via-[#1C1C1C] to-[#2a2a2a] text-white">
@@ -47,7 +78,7 @@ const ConteudosPage = ({ onNavigate }) => {
                             <ArrowLeft className="w-5 h-5" />
                             Voltar para Home
                         </motion.button>
-                        
+
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -85,11 +116,10 @@ const ConteudosPage = ({ onNavigate }) => {
                                 <Filter className="w-5 h-5 text-gray-400" />
                                 <button
                                     onClick={() => setSelectedType('all')}
-                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                                        selectedType === 'all' 
-                                            ? 'bg-purple-600 text-white' 
+                                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${selectedType === 'all'
+                                            ? 'bg-purple-600 text-white'
                                             : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                    }`}
+                                        }`}
                                 >
                                     Todos
                                 </button>
@@ -97,16 +127,52 @@ const ConteudosPage = ({ onNavigate }) => {
                                     <button
                                         key={key}
                                         onClick={() => setSelectedType(key)}
-                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${
-                                            selectedType === key 
-                                                ? 'bg-purple-600 text-white' 
+                                        className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${selectedType === key
+                                                ? 'bg-purple-600 text-white'
                                                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                                        }`}
+                                            }`}
                                     >
                                         <value.icon className="w-4 h-4" />
                                         {value.label}
                                     </button>
                                 ))}
+                            </div>
+
+                            {/* User Controls */}
+                            <div className="flex items-center gap-3 border-l pl-4 md:ml-auto">
+                                {user ? (
+                                    <>
+                                        <button
+                                            onClick={() => setShowSavedOnly(!showSavedOnly)}
+                                            className={`flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors ${showSavedOnly
+                                                    ? 'bg-[#6A1B9A] text-white'
+                                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                }`}
+                                        >
+                                            <Bookmark className={`w-4 h-4 ${showSavedOnly ? 'fill-current' : ''}`} />
+                                            <span className="hidden sm:inline">Meus Salvos</span>
+                                        </button>
+                                        <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-full text-sm text-gray-700">
+                                            <User className="w-4 h-4" />
+                                            <span className="hidden lg:inline">{user?.user_metadata?.name || user?.email?.split('@')[0]}</span>
+                                        </div>
+                                        <button
+                                            onClick={logout}
+                                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors"
+                                            title="Sair"
+                                        >
+                                            <LogOut className="w-4 h-4" />
+                                        </button>
+                                    </>
+                                ) : (
+                                    <button
+                                        onClick={() => setShowLoginModal(true)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-full text-sm font-medium transition-colors shadow-sm"
+                                    >
+                                        <LogIn className="w-4 h-4" />
+                                        <span>Entrar</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -133,15 +199,32 @@ const ConteudosPage = ({ onNavigate }) => {
                                             className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-gray-100"
                                         >
                                             <div className="relative h-56">
-                                                <img 
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                                                    alt={item.title} 
-                                                    src={item.image} 
+                                                <img
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    alt={item.title}
+                                                    src={item.image}
                                                 />
+                                                {item.type === 'video' && (
+                                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                        <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center shadow-lg">
+                                                            <Play className="w-5 h-5 text-[#6A1B9A] ml-1" />
+                                                        </div>
+                                                    </div>
+                                                )}
                                                 <div className={`absolute top-4 left-4 inline-flex items-center gap-2 ${getTypeBadgeStyle(item.type)} px-3 py-1.5 rounded-full text-xs font-semibold`}>
                                                     <IconComponent className="w-4 h-4" />
                                                     <span>{CONTENT_TYPES[item.type]?.label}</span>
                                                 </div>
+                                                <button
+                                                    onClick={(e) => handleToggleSave(e, item.id)}
+                                                    className={`absolute top-4 right-4 p-2 rounded-lg shadow-sm transition-all duration-300 z-10 ${savedContentIds.includes(item.id)
+                                                            ? 'bg-[#6A1B9A] text-white opacity-100'
+                                                            : 'bg-white/90 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-[#6A1B9A] hover:bg-white'
+                                                        }`}
+                                                    title={savedContentIds.includes(item.id) ? "Remover dos salvos" : "Salvar conteúdo"}
+                                                >
+                                                    <Bookmark className={`w-4 h-4 ${savedContentIds.includes(item.id) ? 'fill-current' : ''}`} />
+                                                </button>
                                             </div>
                                             <div className="p-6">
                                                 <h3 className="text-lg font-bold text-gray-900 leading-tight group-hover:text-[#6A1B9A] transition-colors line-clamp-2">
@@ -192,6 +275,7 @@ const ConteudosPage = ({ onNavigate }) => {
             </main>
 
             <Footer />
+            <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
         </div>
     );
 };

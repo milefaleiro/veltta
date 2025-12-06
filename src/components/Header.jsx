@@ -52,12 +52,11 @@ const Header = ({ onNavigate, currentPage = 'home' }) => {
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: 'spring', stiffness: 120, damping: 20 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        shouldHaveDarkBg ? 'bg-[#0B0B0F]/95 backdrop-blur-sm shadow-lg' : 'bg-transparent'
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${shouldHaveDarkBg ? 'bg-[#0B0B0F]/95 backdrop-blur-sm shadow-lg' : 'bg-transparent'
+        }`}
     >
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <button 
+        <button
           onClick={() => handleNavClick('home')}
           className="flex items-center gap-3 cursor-pointer"
         >
@@ -71,29 +70,16 @@ const Header = ({ onNavigate, currentPage = 'home' }) => {
             <li key={item.id}>
               <button
                 onClick={() => handleNavClick(item.id)}
-                className={`transition-colors text-lg font-medium ${
-                  isActive(item.id) 
-                    ? 'text-purple-400' 
+                className={`transition-colors text-lg font-medium ${isActive(item.id)
+                    ? 'text-purple-400'
                     : 'hover:text-purple-400'
-                }`}
+                  }`}
               >
                 {item.label}
               </button>
             </li>
           ))}
-          <li>
-            <button
-              onClick={() => handleNavClick('hub')}
-              className={`transition-colors text-lg font-medium flex items-center gap-2 ${
-                isActive('hub') 
-                  ? 'text-purple-400' 
-                  : 'hover:text-purple-400'
-              }`}
-            >
-              <User className="w-4 h-4" />
-              Área do Aluno
-            </button>
-          </li>
+
         </ul>
 
         <Button
@@ -129,29 +115,16 @@ const Header = ({ onNavigate, currentPage = 'home' }) => {
                 <li key={item.id}>
                   <button
                     onClick={() => handleNavClick(item.id)}
-                    className={`transition-colors ${
-                      isActive(item.id) 
-                        ? 'text-purple-400' 
+                    className={`transition-colors ${isActive(item.id)
+                        ? 'text-purple-400'
                         : 'hover:text-purple-400'
-                    }`}
+                      }`}
                   >
                     {item.label}
                   </button>
                 </li>
               ))}
-              <li>
-                <button
-                  onClick={() => handleNavClick('hub')}
-                  className={`transition-colors flex items-center gap-2 ${
-                    isActive('hub') 
-                      ? 'text-purple-400' 
-                      : 'hover:text-purple-400'
-                  }`}
-                >
-                  <User className="w-6 h-6" />
-                  Área do Aluno
-                </button>
-              </li>
+
             </ul>
             <Button
               onClick={handleWhatsAppClick}

@@ -7,11 +7,15 @@ import Header from '@/components/Header';
 import Hero from '@/components/Hero';
 import Community from '@/components/Community';
 import Footer from '@/components/Footer';
-import KnowledgeHub from '@/components/KnowledgeHub';
+
 import CoCreatePage from '@/components/CoCreatePage';
 import ConsultoriaPage from '@/components/ConsultoriaPage';
 import EducacaoPage from '@/components/EducacaoPage';
 import ConteudosPage from '@/components/ConteudosPage';
+import Services from '@/components/Services';
+import Education from '@/components/Education';
+import Content from '@/components/Content';
+import CTA from '@/components/CTA';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -20,7 +24,7 @@ function App() {
     // Check hash on load and hash changes
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['consultoria', 'educacao', 'conteudos', 'cocrie', 'hub'].includes(hash)) {
+      if (['consultoria', 'educacao', 'conteudos', 'cocrie'].includes(hash)) {
         setCurrentPage(hash);
       } else if (hash === '' || hash === '#') {
         setCurrentPage('home');
@@ -43,7 +47,7 @@ function App() {
   };
 
   const getPageMeta = () => {
-    switch(currentPage) {
+    switch (currentPage) {
       case 'consultoria':
         return { title: 'Consultoria em Compras - Veltta', description: 'Soluções especializadas para elevar a performance da sua área de compras.' };
       case 'educacao':
@@ -52,8 +56,7 @@ function App() {
         return { title: 'Conteúdos - Veltta', description: 'Artigos, podcasts e lives sobre procurement, compras estratégicas e gestão de fornecedores.' };
       case 'cocrie':
         return { title: 'Co-crie com a Veltta', description: 'Contribua com ideias e sugestões para a comunidade Veltta.' };
-      case 'hub':
-        return { title: 'Hub de Conhecimento - Veltta', description: 'Artigos, vídeos, ferramentas e cursos sobre procurement, compras estratégicas e gestão de fornecedores.' };
+
       default:
         return { title: 'Veltta - Consultoria em Compras', description: 'A Veltta capacita empresas com consultoria em compras, seleção de software, PDMS e analytics, além de programas de educação e uma comunidade exclusiva.' };
     }
@@ -62,7 +65,7 @@ function App() {
   const meta = getPageMeta();
 
   const renderPage = () => {
-    switch(currentPage) {
+    switch (currentPage) {
       case 'consultoria':
         return <ConsultoriaPage onNavigate={navigate} />;
       case 'educacao':
@@ -71,15 +74,18 @@ function App() {
         return <ConteudosPage onNavigate={navigate} />;
       case 'cocrie':
         return <CoCreatePage onBack={() => navigate('conteudos')} />;
-      case 'hub':
-        return <KnowledgeHub onBack={() => navigate('home')} />;
+
       default:
         return (
           <div className="min-h-screen">
             <Header onNavigate={navigate} currentPage="home" />
             <main>
               <Hero />
+              <Services />
+              <Education />
+              <Content onViewAll={() => navigate('conteudos')} />
               <Community />
+              <CTA />
             </main>
             <Footer />
           </div>
