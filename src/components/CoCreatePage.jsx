@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Loader2, Check, AlertCircle, Pencil, Plus, LogIn, LogOut, User } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, AlertCircle, Pencil, Plus, LogIn, LogOut, User, X, CheckCircle, XCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,6 +10,7 @@ const CoCreatePage = ({ onBack }) => {
     const { user, isAdmin, logout } = useAuth();
     const [activePopup, setActivePopup] = useState(null);
     const [suggestions, setSuggestions] = useState([]);
+    const [pendingSuggestions, setPendingSuggestions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [votedIds, setVotedIds] = useState(new Set());
@@ -17,6 +18,7 @@ const CoCreatePage = ({ onBack }) => {
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showEditor, setShowEditor] = useState(false);
     const [editingSuggestion, setEditingSuggestion] = useState(null);
+    const [processingIds, setProcessingIds] = useState(new Set()); // IDs sendo processados (aprovar/rejeitar)
     
     // Form state
     const [formData, setFormData] = useState({
@@ -41,18 +43,33 @@ const CoCreatePage = ({ onBack }) => {
     useEffect(() => {
         loadSuggestions();
         loadVotedSuggestions();
-    }, []);
+    }, [isAdmin]);
 
     const loadSuggestions = async () => {
         try {
             setLoading(true);
-            const { data, error } = await supabase
+            
+            // Carrega sugestões aprovadas (voting, development, completed) - visível para todos
+            const { data: approvedData, error: approvedError } = await supabase
                 .from('cocreate_suggestions')
                 .select('*')
+                .in('status', ['voting', 'development', 'completed'])
                 .order('votes', { ascending: false });
             
-            if (error) throw error;
-            setSuggestions(data || []);
+            if (approvedError) throw approvedError;
+            setSuggestions(approvedData || []);
+
+            // Se for admin, também carrega as pendentes
+            if (isAdmin) {
+                const { data: pendingData, error: pendingError } = await supabase
+                    .from('cocreate_suggestions')
+                    .select('*')
+                    .eq('status', 'pending')
+                    .order('created_at', { ascending: false });
+                
+                if (pendingError) throw pendingError;
+                setPendingSuggestions(pendingData || []);
+            }
         } catch (error) {
             console.error('Error loading suggestions:', error);
         } finally {
@@ -63,13 +80,19 @@ const CoCreatePage = ({ onBack }) => {
     const loadVotedSuggestions = async () => {
         try {
             const voterId = getVoterIdentifier();
+            console.log('Loading votes for voter:', voterId);
+            
             const { data, error } = await supabase
                 .from('cocreate_votes')
                 .select('suggestion_id')
                 .eq('voter_identifier', voterId);
             
+            console.log('Loaded votes:', { data, error });
+            
             if (error) throw error;
-            setVotedIds(new Set(data?.map(v => v.suggestion_id) || []));
+            const voteSet = new Set(data?.map(v => v.suggestion_id) || []);
+            console.log('Vote IDs set:', [...voteSet]);
+            setVotedIds(voteSet);
         } catch (error) {
             console.error('Error loading votes:', error);
         }
@@ -79,38 +102,72 @@ const CoCreatePage = ({ onBack }) => {
         const voterId = getVoterIdentifier();
         
         if (votedIds.has(suggestionId)) {
+            console.log('Already voted locally for:', suggestionId);
             return; // Already voted
         }
 
+        // Otimistic update - atualiza UI imediatamente
+        setVotedIds(prev => new Set([...prev, suggestionId]));
+        setSuggestions(prev => prev.map(s => 
+            s.id === suggestionId ? { ...s, votes: (s.votes || 0) + 1 } : s
+        ));
+
         try {
+            console.log('Attempting to vote for:', suggestionId, 'with voter:', voterId);
+            
             // Insert vote record
-            const { error: voteError } = await supabase
+            const { data: voteData, error: voteError } = await supabase
                 .from('cocreate_votes')
-                .insert({ suggestion_id: suggestionId, voter_identifier: voterId });
+                .insert({ suggestion_id: suggestionId, voter_identifier: voterId })
+                .select();
+            
+            console.log('Vote insert result:', { voteData, voteError });
             
             if (voteError) {
-                if (voteError.code === '23505') { // Unique constraint violation
-                    setVotedIds(prev => new Set([...prev, suggestionId]));
-                    return;
+                if (voteError.code === '23505') { // Unique constraint violation - already voted
+                    console.log('Already voted in DB');
+                    return; // Já votou, mantém o estado otimista
                 }
-                throw voteError;
+                console.error('Vote insert error:', voteError);
+                // Reverte o estado otimista
+                setVotedIds(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(suggestionId);
+                    return newSet;
+                });
+                setSuggestions(prev => prev.map(s => 
+                    s.id === suggestionId ? { ...s, votes: Math.max(0, (s.votes || 0) - 1) } : s
+                ));
+                return;
             }
 
-            // Increment vote count using RPC function (bypasses RLS)
-            const { error: rpcError } = await supabase
+            // Vote was successful, now increment the counter using RPC
+            console.log('Vote inserted, incrementing counter...');
+            
+            const { data: rpcData, error: rpcError } = await supabase
                 .rpc('increment_suggestion_votes', { suggestion_uuid: suggestionId });
+            
+            console.log('RPC result:', { rpcData, rpcError });
             
             if (rpcError) {
                 console.error('RPC error:', rpcError);
+                // O voto foi registrado, mas o contador pode não ter sido incrementado
+                // Recarrega as sugestões para sincronizar
+                await loadSuggestions();
             }
-
-            // Update local state
-            setVotedIds(prev => new Set([...prev, suggestionId]));
-            setSuggestions(prev => prev.map(s => 
-                s.id === suggestionId ? { ...s, votes: (s.votes || 0) + 1 } : s
-            ));
+            
+            console.log('Vote successful for:', suggestionId);
         } catch (error) {
             console.error('Error voting:', error);
+            // Reverte o estado otimista em caso de erro
+            setVotedIds(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(suggestionId);
+                return newSet;
+            });
+            setSuggestions(prev => prev.map(s => 
+                s.id === suggestionId ? { ...s, votes: Math.max(0, (s.votes || 0) - 1) } : s
+            ));
         }
     };
 
@@ -125,7 +182,7 @@ const CoCreatePage = ({ onBack }) => {
             setSubmitting(true);
             setSubmitStatus(null);
 
-            // Save to Supabase
+            // Save to Supabase - novas sugestões começam como 'pending'
             const { error } = await supabase
                 .from('cocreate_suggestions')
                 .insert({
@@ -135,7 +192,7 @@ const CoCreatePage = ({ onBack }) => {
                     email: formData.email.trim() || null,
                     suggestion: formData.suggestion.trim(),
                     votes: 0,
-                    status: 'voting'
+                    status: 'pending'
                 });
 
             if (error) throw error;
@@ -216,6 +273,60 @@ Nova sugestão recebida no Veltta Co-Create!
 
     const handleEditorSave = () => {
         loadSuggestions();
+    };
+
+    // Aprovar sugestão (muda de 'pending' para 'voting')
+    const handleApproveSuggestion = async (suggestionId) => {
+        try {
+            setProcessingIds(prev => new Set([...prev, suggestionId]));
+            
+            const { error } = await supabase
+                .from('cocreate_suggestions')
+                .update({ status: 'voting' })
+                .eq('id', suggestionId);
+            
+            if (error) throw error;
+            
+            // Atualiza estado local
+            const approvedSuggestion = pendingSuggestions.find(s => s.id === suggestionId);
+            if (approvedSuggestion) {
+                setPendingSuggestions(prev => prev.filter(s => s.id !== suggestionId));
+                setSuggestions(prev => [{ ...approvedSuggestion, status: 'voting' }, ...prev]);
+            }
+        } catch (error) {
+            console.error('Error approving suggestion:', error);
+        } finally {
+            setProcessingIds(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(suggestionId);
+                return newSet;
+            });
+        }
+    };
+
+    // Rejeitar sugestão (deleta permanentemente)
+    const handleRejectSuggestion = async (suggestionId) => {
+        try {
+            setProcessingIds(prev => new Set([...prev, suggestionId]));
+            
+            const { error } = await supabase
+                .from('cocreate_suggestions')
+                .delete()
+                .eq('id', suggestionId);
+            
+            if (error) throw error;
+            
+            // Remove do estado local
+            setPendingSuggestions(prev => prev.filter(s => s.id !== suggestionId));
+        } catch (error) {
+            console.error('Error rejecting suggestion:', error);
+        } finally {
+            setProcessingIds(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(suggestionId);
+                return newSet;
+            });
+        }
     };
 
     const getStatusBadge = (status) => {
@@ -387,6 +498,58 @@ Nova sugestão recebida no Veltta Co-Create!
 
                 {/* Bottom */}
                 <div className="flex flex-col gap-3.5 mt-1">
+                    {/* Admin Pending Suggestions Panel */}
+                    {isAdmin && pendingSuggestions.length > 0 && (
+                        <div className="w-full rounded-[22px] bg-white shadow-[0_18px_40px_rgba(32,18,90,0.16)] border-2 border-amber-300 overflow-hidden">
+                            <div className="bg-gradient-to-br from-amber-500 to-orange-500 px-4 py-2.5 text-white flex justify-between items-center">
+                                <div className="text-[15px] font-semibold flex items-center gap-2">
+                                    <AlertCircle className="w-4 h-4" />
+                                    Sugestões Aguardando Aprovação ({pendingSuggestions.length})
+                                </div>
+                                <div className="text-[11px] px-2.5 py-1 rounded-full border border-white/50 bg-white/10">
+                                    Apenas você pode ver esta seção
+                                </div>
+                            </div>
+                            <div className="p-4 space-y-3">
+                                {pendingSuggestions.map((suggestion) => (
+                                    <div key={suggestion.id} className="flex items-start justify-between p-3 bg-amber-50 rounded-xl border border-amber-200 group">
+                                        <div className="flex-1">
+                                            <p className="text-[14px] text-[#443a68] font-medium mb-1">{suggestion.suggestion}</p>
+                                            <div className="flex items-center gap-3 text-[11px] text-[#6b6885]">
+                                                <span>Por: {suggestion.name}</span>
+                                                {suggestion.position && <span>• {suggestion.position}</span>}
+                                                {suggestion.company_segment && <span>• {suggestion.company_segment}</span>}
+                                                <span>• {new Date(suggestion.created_at).toLocaleDateString('pt-BR')}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2 ml-4">
+                                            {processingIds.has(suggestion.id) ? (
+                                                <Loader2 className="w-5 h-5 animate-spin text-[#6A31FF]" />
+                                            ) : (
+                                                <>
+                                                    <button
+                                                        onClick={() => handleApproveSuggestion(suggestion.id)}
+                                                        className="p-2 rounded-lg bg-green-100 hover:bg-green-200 text-green-700 transition-colors"
+                                                        title="Aprovar sugestão"
+                                                    >
+                                                        <CheckCircle className="w-5 h-5" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleRejectSuggestion(suggestion.id)}
+                                                        className="p-2 rounded-lg bg-red-100 hover:bg-red-200 text-red-700 transition-colors"
+                                                        title="Rejeitar sugestão"
+                                                    >
+                                                        <XCircle className="w-5 h-5" />
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
                     {/* Table Card */}
                     <div className="w-full rounded-[22px] bg-white shadow-[0_18px_40px_rgba(32,18,90,0.16)] border border-[#ece7ff] overflow-hidden">
                         <div className="bg-gradient-to-br from-[#6A31FF] to-[#9C63FF] px-4 py-2.5 text-white flex justify-between items-center">
@@ -479,7 +642,7 @@ Nova sugestão recebida no Veltta Co-Create!
                                                 <Check className="w-8 h-8 text-[#0d7b48]" />
                                             </div>
                                             <div className="text-lg font-semibold text-[#22153b] mb-2">Sugestão enviada!</div>
-                                            <p className="text-[13px] text-[#6b6885]">Obrigado por contribuir com o Veltta Hub.</p>
+                                            <p className="text-[13px] text-[#6b6885]">Sua sugestão será avaliada pela equipe Veltta e, se aprovada, aparecerá para votação da comunidade.</p>
                                         </div>
                                     ) : submitStatus === 'error' ? (
                                         <div className="py-8 text-center">

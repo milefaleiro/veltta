@@ -3,29 +3,18 @@ import { motion } from 'framer-motion';
 import { Menu, X, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import VelttaLogo from '@/components/VelttaLogo';
-import { useToast } from '@/components/ui/use-toast';
 
-const Header = ({ onNavigateToHub }) => {
+const Header = ({ onNavigate, currentPage = 'home' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { toast } = useToast();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleLinkClick = (e, id) => {
-    e.preventDefault();
-    const section = document.getElementById(id);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-      setIsOpen(false); // Close mobile menu after clicking
-    } else {
-      toast({
-        title: "🚧 Página em construção!",
-        description: "Esta seção estará disponível em breve. Continue explorando!",
-      });
-    }
+  const handleNavClick = (page) => {
+    onNavigate(page);
+    setIsOpen(false);
   };
 
   const handleWhatsAppClick = () => {
@@ -47,6 +36,14 @@ const Header = ({ onNavigateToHub }) => {
     };
   }, []);
 
+  const navItems = [
+    { id: 'consultoria', label: 'Consultoria' },
+    { id: 'educacao', label: 'Educação' },
+    { id: 'conteudos', label: 'Conteúdos' },
+  ];
+
+  const isActive = (page) => currentPage === page;
+
   return (
     <motion.header
       initial={{ y: -100 }}
@@ -57,44 +54,38 @@ const Header = ({ onNavigateToHub }) => {
       }`}
     >
       <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <button 
+          onClick={() => handleNavClick('home')}
+          className="flex items-center gap-3 cursor-pointer"
+        >
           <VelttaLogo />
           <span className="text-2xl font-bold text-white">Veltta</span>
-        </div>
+        </button>
 
         {/* Desktop Navigation */}
         <ul className="hidden md:flex items-center space-x-8 text-white">
-          <li>
-            <a
-              href="#consultoria"
-              onClick={(e) => handleLinkClick(e, 'consultoria')}
-              className="hover:text-purple-400 transition-colors text-lg font-medium"
-            >
-              Consultoria
-            </a>
-          </li>
-          <li>
-            <a
-              href="#educacao"
-              onClick={(e) => handleLinkClick(e, 'educacao')}
-              className="hover:text-purple-400 transition-colors text-lg font-medium"
-            >
-              Educação
-            </a>
-          </li>
-          <li>
-            <a
-              href="#conteudo"
-              onClick={(e) => handleLinkClick(e, 'conteudo')}
-              className="hover:text-purple-400 transition-colors text-lg font-medium"
-            >
-              Conteúdos
-            </a>
-          </li>
+          {navItems.map((item) => (
+            <li key={item.id}>
+              <button
+                onClick={() => handleNavClick(item.id)}
+                className={`transition-colors text-lg font-medium ${
+                  isActive(item.id) 
+                    ? 'text-purple-400' 
+                    : 'hover:text-purple-400'
+                }`}
+              >
+                {item.label}
+              </button>
+            </li>
+          ))}
           <li>
             <button
-              onClick={onNavigateToHub}
-              className="hover:text-purple-400 transition-colors text-lg font-medium flex items-center gap-2"
+              onClick={() => handleNavClick('hub')}
+              className={`transition-colors text-lg font-medium flex items-center gap-2 ${
+                isActive('hub') 
+                  ? 'text-purple-400' 
+                  : 'hover:text-purple-400'
+              }`}
             >
               <User className="w-4 h-4" />
               Área do Aluno
@@ -131,40 +122,28 @@ const Header = ({ onNavigateToHub }) => {
             className="fixed inset-0 bg-[#0B0B0F] z-40 flex flex-col items-center justify-center md:hidden"
           >
             <ul className="flex flex-col space-y-8 text-white text-2xl">
-              <li>
-                <a
-                  href="#consultoria"
-                  onClick={(e) => handleLinkClick(e, 'consultoria')}
-                  className="hover:text-purple-400 transition-colors"
-                >
-                  Consultoria
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#educacao"
-                  onClick={(e) => handleLinkClick(e, 'educacao')}
-                  className="hover:text-purple-400 transition-colors"
-                >
-                  Educação
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#conteudo"
-                  onClick={(e) => handleLinkClick(e, 'conteudo')}
-                  className="hover:text-purple-400 transition-colors"
-                >
-                  Conteúdos
-                </a>
-              </li>
+              {navItems.map((item) => (
+                <li key={item.id}>
+                  <button
+                    onClick={() => handleNavClick(item.id)}
+                    className={`transition-colors ${
+                      isActive(item.id) 
+                        ? 'text-purple-400' 
+                        : 'hover:text-purple-400'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                </li>
+              ))}
               <li>
                 <button
-                  onClick={() => {
-                    onNavigateToHub();
-                    setIsOpen(false);
-                  }}
-                  className="hover:text-purple-400 transition-colors flex items-center gap-2"
+                  onClick={() => handleNavClick('hub')}
+                  className={`transition-colors flex items-center gap-2 ${
+                    isActive('hub') 
+                      ? 'text-purple-400' 
+                      : 'hover:text-purple-400'
+                  }`}
                 >
                   <User className="w-6 h-6" />
                   Área do Aluno
