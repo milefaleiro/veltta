@@ -223,6 +223,7 @@ const ConteudosPage = ({ onNavigate }) => {
                                             whileInView={{ opacity: 1, y: 0 }}
                                             viewport={{ once: true, amount: 0.2 }}
                                             transition={{ duration: 0.6, delay: index * 0.1 }}
+                                            onClick={() => onNavigate(`conteudo/${item.id}`)}
                                             className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group border border-gray-100"
                                         >
                                             <div className="relative h-56">
@@ -313,10 +314,10 @@ const ConteudosPage = ({ onNavigate }) => {
 
             <Footer />
             <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
-            <ContentEditor 
-                isOpen={showEditor} 
-                onClose={() => { setShowEditor(false); setEditingContent(null); }} 
-                editingContent={editingContent} 
+            <ContentEditor
+                isOpen={showEditor}
+                onClose={() => { setShowEditor(false); setEditingContent(null); }}
+                editingContent={editingContent}
             />
             <LeadsViewer isOpen={showLeadsViewer} onClose={() => setShowLeadsViewer(false)} />
         </div>

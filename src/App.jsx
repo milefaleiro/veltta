@@ -17,17 +17,30 @@ import Education from '@/components/Education';
 import Content from '@/components/Content';
 import CTA from '@/components/CTA';
 
+
+import ContentRoute from '@/components/ContentRoute';
+
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
+  const [currentContentId, setCurrentContentId] = useState(null);
 
   useEffect(() => {
     // Check hash on load and hash changes
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '');
-      if (['consultoria', 'educacao', 'conteudos', 'cocrie'].includes(hash)) {
+
+      if (hash.startsWith('conteudo/')) {
+        const id = hash.split('/')[1];
+        if (id) {
+          setCurrentContentId(id);
+          setCurrentPage('conteudo-detail');
+        }
+      } else if (['consultoria', 'educacao', 'conteudos', 'cocrie'].includes(hash)) {
         setCurrentPage(hash);
+        setCurrentContentId(null);
       } else if (hash === '' || hash === '#') {
         setCurrentPage('home');
+        setCurrentContentId(null);
       }
     };
 
@@ -42,7 +55,7 @@ function App() {
     } else {
       window.location.hash = page;
     }
-    setCurrentPage(page);
+    // State update will happen via hashchange listener
     window.scrollTo(0, 0);
   };
 
@@ -56,7 +69,8 @@ function App() {
         return { title: 'Conteúdos - Veltta', description: 'Artigos, podcasts e lives sobre procurement, compras estratégicas e gestão de fornecedores.' };
       case 'cocrie':
         return { title: 'Co-crie com a Veltta', description: 'Contribua com ideias e sugestões para a comunidade Veltta.' };
-
+      case 'conteudo-detail':
+        return { title: 'Conteúdo - Veltta', description: 'Conteúdo exclusivo Veltta' };
       default:
         return { title: 'Veltta - Consultoria em Compras', description: 'A Veltta capacita empresas com consultoria em compras, seleção de software, PDMS e analytics, além de programas de educação e uma comunidade exclusiva.' };
     }
@@ -74,6 +88,8 @@ function App() {
         return <ConteudosPage onNavigate={navigate} />;
       case 'cocrie':
         return <CoCreatePage onBack={() => navigate('conteudos')} />;
+      case 'conteudo-detail':
+        return <ContentRoute contentId={currentContentId} onNavigate={navigate} />;
 
       default:
         return (
