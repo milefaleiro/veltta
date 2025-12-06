@@ -94,7 +94,7 @@ export const ContentProvider = ({ children }) => {
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
-            
+
             // Converte todos os itens para camelCase
             const camelData = (data || []).map(toCamelCase);
             setContents(camelData);
@@ -123,7 +123,7 @@ export const ContentProvider = ({ children }) => {
             const { data, error } = await supabase
                 .from('saved_contents')
                 .select('content_id');
-            
+
             if (error) throw error;
             if (data) setSavedContentIds(data.map(item => item.content_id));
         } catch (error) {
@@ -133,7 +133,7 @@ export const ContentProvider = ({ children }) => {
 
     const toggleSaveContent = async (contentId) => {
         if (!user) return { error: 'not_logged_in' };
-        
+
         try {
             const isSaved = savedContentIds.includes(contentId);
             if (isSaved) {
@@ -142,7 +142,7 @@ export const ContentProvider = ({ children }) => {
                     .delete()
                     .eq('user_id', user.id)
                     .eq('content_id', contentId);
-                
+
                 if (error) throw error;
                 setSavedContentIds(prev => prev.filter(id => id !== contentId));
                 return { saved: false };
@@ -151,7 +151,7 @@ export const ContentProvider = ({ children }) => {
                     .from('saved_contents')
                     .insert({ user_id: user.id, content_id: contentId })
                     .select();
-                
+
                 if (error) throw error;
                 setSavedContentIds(prev => [...prev, contentId]);
                 return { saved: true };
@@ -170,10 +170,10 @@ export const ContentProvider = ({ children }) => {
         try {
             // Remove id if present to let DB generate it
             const { id, ...contentData } = content;
-            
+
             // Converte para snake_case antes de enviar ao banco
             const dbData = toSnakeCase(contentData);
-            
+
             const { data, error } = await supabase
                 .from('contents')
                 .insert([dbData])
@@ -181,7 +181,7 @@ export const ContentProvider = ({ children }) => {
                 .single();
 
             if (error) throw error;
-            
+
             // Converte de volta para camelCase
             const camelData = toCamelCase(data);
             setContents(prev => [camelData, ...prev]);
@@ -196,7 +196,7 @@ export const ContentProvider = ({ children }) => {
         try {
             // Converte para snake_case antes de enviar ao banco
             const dbUpdates = toSnakeCase(updates);
-            
+
             const { data, error } = await supabase
                 .from('contents')
                 .update(dbUpdates)
