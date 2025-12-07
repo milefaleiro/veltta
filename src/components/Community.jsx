@@ -22,16 +22,11 @@ const Community = () => {
               Comunidade de <span className="text-purple-500">Compradores</span>
             </h2>
             <p className="text-gray-400 text-lg mb-8 leading-relaxed">
-              Junte-se a um espaço gratuito e exclusivo no WhatsApp para troca de experiências, networking e discussões valiosas com outros profissionais de compras.
+              Disponível em breve
             </p>
-            <a
-              href="https://chat.whatsapp.com/..."
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#8E24AA] text-white font-semibold rounded-lg hover:bg-[#7B1FA2] transition-colors"
-            >
-              Quero Fazer Parte <ArrowRight className="w-5 h-5" />
-            </a>
+            <div className="inline-flex items-center gap-2 px-8 py-4 bg-gray-600 text-gray-400 font-semibold rounded-lg cursor-not-allowed opacity-60">
+              Em breve
+            </div>
           </div>
           <div className="flex-1 relative">
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
